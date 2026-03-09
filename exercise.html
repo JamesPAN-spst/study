@@ -2,212 +2,526 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>反常积分敛散性：50题过程与细节特训系统</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>反常积分敛散性：50题极限交互特训</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; max-width: 950px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #2c3e50; }
-        h1 { text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-bottom: 30px; }
-        .intro-panel { background: #e8f8f5; border-left: 5px solid #1abc9c; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .section-title { background: #34495e; color: white; padding: 10px 15px; border-radius: 5px; margin: 30px 0 15px 0; font-size: 1.2em; }
-        .question-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s; border-left: 4px solid #bdc3c7; }
-        .question-card:hover { transform: translateY(-2px); border-left: 4px solid #3498db; }
-        .question-title { font-weight: bold; font-size: 1.05em; margin-bottom: 12px; color: #2980b9; }
-        .options label { display: block; margin: 8px 0; cursor: pointer; padding: 10px; border-radius: 5px; background: #f9f9f9; border: 1px solid #eee; transition: all 0.2s; }
-        .options label:hover { background: #ebf5fb; border-color: #AED6F1; }
-        .options input { margin-right: 12px; transform: scale(1.2); }
-        #submit-btn { display: block; width: 250px; margin: 40px auto; padding: 15px; font-size: 1.2em; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(231,76,60,0.3); transition: background 0.3s; }
-        #submit-btn:hover { background: #c0392b; }
-        #result-section { display: none; margin-top: 40px; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .score-display { font-size: 2.5em; text-align: center; color: #e74c3c; font-weight: bold; margin-bottom: 10px; }
-        .score-comment { text-align: center; font-size: 1.2em; color: #7f8c8d; margin-bottom: 30px; }
-        .mistake-card { border-left: 5px solid #e74c3c; background: #fdf2f0; padding: 20px; margin-bottom: 20px; border-radius: 6px; }
-        .mistake-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #fadbd8; padding-bottom: 10px; }
-        .explanation { margin-top: 15px; padding: 15px; background: #fff; border-radius: 5px; border: 1px dashed #1abc9c; color: #16a085; line-height: 1.6; }
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #3b82f6;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #app-container {
+            flex-grow: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 1.05em;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background-color: #ecfdf5;
+            border-color: #10b981;
+            color: #065f46;
+            font-weight: 500;
+        }
+
+        .option-btn.wrong {
+            background-color: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        #explanation {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            animation: slideDown 0.3s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: #2563eb; }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+        
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-secondary:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-secondary:disabled { opacity: 0; pointer-events: none; }
+
+        .question-text {
+            font-size: 1.15em;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        /* 导航弹窗动画 */
+        #nav-modal {
+            transition: opacity 0.3s ease;
+        }
+        #nav-modal-content {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-hidden #nav-modal-content {
+            transform: scale(0.95) translateY(10px);
+        }
     </style>
 </head>
 <body>
 
-    <h1>反常积分敛散性：50题过程与细节特训</h1>
-    
-    <div class="intro-panel">
-        <strong>教练导语：</strong> 真正的数学能力不体现在抛硬币猜“收敛/发散”，而体现在你构造试探函数时的眼光、拆分积分区间的直觉，以及验证定理条件时的严谨。这套题将逼迫你思考<strong>“为什么这么做”</strong>以及<strong>“第一步该干什么”</strong>。
-    </div>
-
-    <form id="quiz-form">
-        <div id="questions-container"></div>
-    </form>
-    
-    <button id="submit-btn" onclick="submitQuiz()">交卷并生成错题与解析</button>
-
-    <div id="result-section">
-        <div class="score-display">得分: <span id="score">0</span> / 50</div>
-        <div class="score-comment" id="score-comment"></div>
-        <h2 style="color: #c0392b; border-bottom: 2px solid #fadbd8; padding-bottom: 10px;">📉 过程漏洞扫描与教练复盘</h2>
-        <div id="mistakes-container"></div>
-    </div>
-
-    <script>
-        const questions = [
-            // 第一阶段：比较函数的精准选取 (考察“阶”的洞察力)
-            { type: 'section', title: '阶段一：试探函数的精准构造 (选什么比较？)' },
-            { q: "使用极限比较判别法研究 \\(\\int_{1}^{+\\infty} \\frac{3x^2 + 5}{x^5 + 2x^2 + 1} dx\\) 的敛散性时，最佳的试探函数 \\(g(x)\\) 是什么？", opts: ["\\(1/x^5\\)", "\\(1/x^2\\)", "\\(1/x^3\\)", "\\(3/x^5\\)"], ans: 2, exp: "抓大头：分子最高阶是 \\(x^2\\)，分母最高阶是 \\(x^5\\)，整体等价于 \\(x^2/x^5 = 1/x^3\\)。常数系数 3 在求极限时不会影响是否等于0或无穷大，选基础的 \\(1/x^3\\) 最简洁。" },
-            { q: "要证明 \\(\\int_{1}^{+\\infty} x^{10} e^{-x} dx\\) 收敛，如果你选择极限比较判别法，以下哪个试探函数 \\(g(x)\\) 能帮你顺利得到结论？", opts: ["\\(1/x^{10}\\)", "\\(e^{-x}\\)", "\\(1/x\\)", "\\(1/x^2\\)"], ans: 3, exp: "核心在于指数的强衰减性。你需要选一个已知收敛的无穷积分（如 \\(1/x^2\\)）。极限 \\(\\lim_{x\\to\\infty} \\frac{x^{10}e^{-x}}{1/x^2} = \\lim_{x\\to\\infty} \\frac{x^{12}}{e^x} = 0\\)。既然极限为 0 且分母收敛，原积分必收敛。" },
-            { q: "研究瑕积分 \\(\\int_{0}^{1} \\frac{1}{\\sin x + x^2} dx\\) (瑕点为0)，在 \\(x \\to 0^+\\) 时，应将原函数与哪个 \\(g(x)\\) 进行比较？", opts: ["\\(1/x\\)", "\\(1/x^2\\)", "\\(1/x^3\\)", "\\(\\sin x\\)"], ans: 0, exp: "泰勒展开第一项定生死。当 \\(x \\to 0\\) 时，\\(\\sin x \\sim x\\)，所以分母 \\(\\sin x + x^2 \\sim x + x^2 \\sim x\\)（低次项主导）。故与 \\(1/x\\) 比较，结论是发散。" },
-            { q: "判断 \\(\\int_{2}^{+\\infty} \\frac{1}{\\ln x} dx\\) 发散，最简单的比较放缩法是利用哪个不等式？", opts: ["\\(\\ln x < x\\) (当 \\(x>0\\))", "\\(\\ln x > x\\)", "\\(\\ln x < e^x\\)", "\\(\\ln x < x^2\\)"], ans: 0, exp: "利用基本不等式 \\(\\ln x < x\\)，取倒数得到 \\(\\frac{1}{\\ln x} > \\frac{1}{x}\\)。因为 \\(\\int 1/x\\) 发散，比它大的原积分自然发散。" },
-            { q: "对于 \\(\\int_{1}^{+\\infty} (1 - \\cos \\frac{1}{x}) dx\\)，合适的等价试探函数是？", opts: ["\\(1/x\\)", "\\(1/x^2\\)", "\\(1/x^3\\)", "\\(1/\\sqrt{x}\\)"], ans: 1, exp: "无穷远处 \\(1/x \\to 0\\)，利用等价无穷小 \\(1 - \\cos u \\sim \\frac{1}{2}u^2\\)，所以被积函数等价于 \\(\\frac{1}{2x^2}\\)，阶数为 2，故收敛。" },
-
-            // 第二阶段：极限计算与边界突破 (考查计算扎实度)
-            { type: 'section', title: '阶段二：极限计算与边界条件检验 (验证过程严谨性)' },
-            { q: "在使用比较判别法处理 \\(\\int_{1}^{+\\infty} \\frac{x^p}{e^x} dx\\) 时，无论 \\(p\\) 取多大的实数，\\(\\lim_{x \\to +\\infty} \\frac{x^p/e^x}{1/x^2}\\) 的结果永远是？", opts: ["\\(p\\)", "1", "0", "\\(+\\infty\\)"], ans: 2, exp: "这是指数函数“降维打击”的核心事实：对任意实数次幂，指数函数的增长速度远超幂函数，极限恒为 0。" },
-            { q: "设被积函数非负。若计算出极限 \\(\\lim_{x \\to +\\infty} \\frac{f(x)}{1/x} = 0\\)，你能得出什么结论？", opts: ["\\(\\int f(x)dx\\) 收敛", "\\(\\int f(x)dx\\) 发散", "无法判断敛散性", "原函数趋于0"], ans: 2, exp: "极限为 0 意味着 \\(f(x)\\) 比 \\(1/x\\) 衰减得更快。但它衰减得够不够快（有没有达到 \\(1/x^{1.01}\\) 的程度）是未知的！例如 \\(f(x) = \\frac{1}{x\\ln x}\\)，极限是 0 但积分发散。这是考研常见逻辑陷阱。" },
-            { q: "若计算出极限 \\(\\lim_{x \\to +\\infty} \\frac{f(x)}{1/x^2} = +\\infty\\) (且 \\(f(x)>0\\))，你能得出什么结论？", opts: ["收敛", "发散", "无法判断", "条件收敛"], ans: 2, exp: "极限为无穷大，说明 \\(f(x)\\) 比 \\(1/x^2\\) 衰减得慢，或者根本不衰减。但比 \\(1/x^2\\) 慢不代表一定发散，比如 \\(f(x) = 1/x^{1.5}\\) 依然收敛。所以无法判断。" },
-            { q: "研究瑕积分 \\(\\int_{0}^{1} \\frac{1}{x^{p-1}} dx\\) 收敛的充要条件是什么？", opts: ["\\(p > 1\\)", "\\(p < 1\\)", "\\(p - 1 < 1\\) 即 \\(p < 2\\)", "\\(p - 1 > 1\\) 即 \\(p > 2\\)"], ans: 2, exp: "瑕积分的 p-判别法要求分母的幂次严格小于 1，即 \\(p - 1 < 1\\)，解得 \\(p < 2\\)。必须与无穷积分的准则区分开！" },
-            { q: "在判断 \\(\\int_{1}^{+\\infty} \\frac{\\arctan x}{x^{1.5}} dx\\) 时，为了说明收敛，第一步最佳的放缩是？", opts: ["\\(\\arctan x < x\\)", "\\(\\arctan x < \\pi/2\\)", "\\(\\arctan x > 1\\)", "\\(\\arctan x < 1/x\\)"], ans: 1, exp: "不需要等价无穷小，因为 \\(\\arctan x\\) 在无穷远处是有界的且趋于常数 \\(\\pi/2\\)，直接放缩为常数，问题就变成了 \\(p=1.5\\) 的积分。" },
-
-            // 第三阶段：阿贝尔与狄利克雷的步骤剥离 (条件收敛的心法)
-            { type: 'section', title: '阶段三：狄利克雷与阿贝尔的步骤剥离 (条件收敛)' },
-            { q: "应用狄利克雷判别法证明 \\(\\int_{1}^{+\\infty} \\frac{\\cos x}{x} dx\\) 收敛。令 \\(f(x) = \\cos x\\), \\(g(x) = 1/x\\)。对于 \\(f(x)\\)，你需要向阅卷人展示的具体证明是？", opts: ["\\(\\lim_{x\\to\\infty} \\cos x = 0\\)", "\\(|\\cos x| \\le 1\\)", "\\(|\\int_1^A \\cos x dx| = |\\sin A - \\sin 1| \\le 2\\) (原函数有界)", "\\(\\cos x\\) 单调递减"], ans: 2, exp: "狄利克雷判别法中，对振荡部分的要求是**“积分有界”**，而不是函数本身有界！你必须写出原函数并证明其有界。" },
-            { q: "在上述狄利克雷判别法中，对于 \\(g(x) = 1/x\\)，你需要验证的两个条件是？", opts: ["连续且大于0", "单调且有界", "单调且极限为0", "绝对可积"], ans: 2, exp: "狄利克雷对非振荡项的要求非常苛刻：必须**单调**，并且极限必须为 **0**。单调性在考试时常常需要求导来证明。" },
-            { q: "如果要用阿贝尔判别法证明 \\(\\int_{1}^{+\\infty} \\frac{\\sin x}{x} e^{-1/x} dx\\) 收敛，已知 \\(\\int_{1}^{+\\infty} \\frac{\\sin x}{x} dx\\) 收敛，对 \\(g(x) = e^{-1/x}\\) 你需要验证什么？", opts: ["单调且趋于0", "单调且有界", "极限为0", "积分有界"], ans: 1, exp: "阿贝尔判别法的作用是“不破坏原有的收敛性”。所以要求 \\(g(x)\\) 是**单调且有界**的乘子。（此处 \\(g(x)\\) 单调递增趋于 1，有界）。" },
-            { q: "在处理更复杂的振荡积分 \\(\\int_{1}^{+\\infty} x^2 \\sin(x^4) dx\\) 时，直接用狄利克雷行不通，标准的操作手法是？", opts: ["利用洛必达法则求极限", "加绝对值放缩", "作变量代换 \\(t = x^4\\) 降阶", "利用泰勒展开"], ans: 2, exp: "遇到频率越来越高的振荡，第一步永远是**降阶代换**。令 \\(t = x^4\\)，则 \\(dt = 4x^3 dx\\)，原式将化为 \\(\\int \\frac{\\sin t}{4 t^{1/4}} dt\\)，此时即可完美适用狄利克雷判别法。" },
-            { q: "如果一个瑕积分和无穷积分混合的题目如 \\(\\int_{0}^{+\\infty} \\frac{\\sin x}{x^p} dx\\)，第一步永远应该怎么做？", opts: ["直接使用狄利克雷判别法", "取对数分析", "将其拆分为 \\(\\int_{0}^{1}\\) 和 \\(\\int_{1}^{+\\infty}\\) 分段讨论", "利用分布积分"], ans: 2, exp: "奇点隔离原则。狄利克雷只能处理无穷远，不能处理瑕点；等价无穷小通常用来处理瑕点。必须从中间截断，分别证明两端都收敛。" },
-
-            // 第四阶段：实战综合判断（包含前面的坑点）
-            { type: 'section', title: '阶段四：实战综合判定 (35题高强度肌肉记忆)' },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{1}{x^{1.001}} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "p > 1 收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{1}{x^{0.999}} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "p <= 1 发散" },
-            { q: "积分 \\(\\int_{2}^{+\\infty} \\frac{1}{x \\ln x} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "换元后等价于 \\(1/u\\) 积分，发散" },
-            { q: "积分 \\(\\int_{2}^{+\\infty} \\frac{1}{x (\\ln x)^2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "换元后等价于 \\(1/u^2\\) 积分，收敛" },
-            { q: "瑕积分 \\(\\int_{0}^{1} \\frac{1}{x^{0.999}} dx\\) (瑕点在0)", opts: ["收敛", "发散"], ans: 0, exp: "瑕积分要求 p < 1 才收敛" },
-            { q: "瑕积分 \\(\\int_{0}^{1} \\frac{1}{x^{1.001}} dx\\) (瑕点在0)", opts: ["收敛", "发散"], ans: 1, exp: "瑕积分要求 p < 1，此处 p>1 故发散" },
-            { q: "积分 \\(\\int_{0}^{1} \\frac{1}{\\sqrt{1-x}} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "瑕点在1，做代换或平移后相当于 p=1/2 < 1 的瑕积分，收敛" },
-            { q: "积分 \\(\\int_{0}^{\\pi/2} \\frac{\\cos x}{\\sqrt{x}} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "瑕点在0，被积函数 \\(\\sim 1/x^{0.5}\\)，收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{x^3}{x^5 + 2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "同阶于 \\(1/x^2\\)，收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{x^3}{x^4 + 2} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "同阶于 \\(1/x\\)，发散" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\sqrt{x+1}}{x^2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "同阶于 \\(x^{0.5}/x^2 = 1/x^{1.5}\\)，收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{1}{\\sqrt{x(x+1)(x+2)}} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "根号内为三次，故分母同阶于 \\(x^{1.5}\\)，收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} e^{-2x} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "基础指数衰减" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} x^{2026} e^{-x} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "指数强衰减秒杀多项式" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} e^{-x^2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "高斯积分，极强衰减" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\ln x}{x^2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "对数增长极慢，选 \\(g(x)=1/x^{1.5}\\) 比较极限为0，收敛" },
-            { q: "积分 \\(\\int_{2}^{+\\infty} \\frac{1}{\\ln(x^2)} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "对数函数远小于 \\(x\\)，故分式远大于 \\(1/x\\)，发散" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\sin x}{x} dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 1, exp: "经典狄利克雷，条件收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\cos x}{x^3} dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 0, exp: "加绝对值后放缩为 \\(1/x^3\\) 即可，绝对收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\sin(x^2) dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 1, exp: "菲涅尔积分，换元后利用狄利克雷，条件收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\sin x}{\\sqrt{x}} e^{-x} dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 0, exp: "有指数函数兜底保护，加绝对值放缩后绝对收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{\\sin^2 x}{x} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "半角公式展开化为 \\(\\frac{1-\\cos 2x}{2x}\\)。\\(\\cos 2x / x\\) 收敛，但 \\(1/2x\\) 发散，整体发散！" },
-            { q: "积分 \\(\\int_{0}^{1} \\frac{1}{\\ln(1+\\sqrt{x})} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "瑕点在0，等价于 \\(1/x^{0.5}\\)，收敛" },
-            { q: "积分 \\(\\int_{0}^{1} \\frac{e^x - 1}{x^{1.5}} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "瑕点在0，分子等价于 \\(x\\)，整体等价于 \\(1/x^{0.5}\\)，收敛" },
-            { q: "积分 \\(\\int_{0}^{1} \\frac{\\cos x}{x} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "瑕点在0，\\(\\cos 0 = 1\\)，等价于 \\(1/x\\)，发散" },
-            { q: "积分 \\(\\int_{0}^{+\\infty} \\frac{x}{1+x^3} \\sin x dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 0, exp: "无瑕点，无穷远处加绝对值放缩为 \\(1/x^2\\)，绝对收敛" },
-            { q: "积分 \\(\\int_{2}^{+\\infty} \\frac{\\sin x}{\\ln x} dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 1, exp: "用狄利克雷判定收敛。加绝对值后发散，故条件收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} (-1)^{[x]} \\frac{1}{x} dx\\) (注:[x]为取整函数)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 1, exp: "分段常数振荡，化为交错级数 \\(1/n\\)，条件收敛" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} \\frac{x \\sin x}{x^2+1} dx\\)", opts: ["绝对收敛", "条件收敛", "发散"], ans: 1, exp: "可用狄利克雷证明收敛（注意 \\(x/(x^2+1)\\) 单调降），加绝对值发散" },
-            { q: "瑕积分 \\(\\int_{0}^{\\pi/2} \\tan x dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "瑕点在 \\(\\pi/2\\)，等价于 \\(1/(\\pi/2 - x)\\)，p=1发散" },
-            { q: "积分 \\(\\int_{0}^{+\\infty} \\frac{\\arctan x}{1+x^2} dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "可直接算出原函数 \\(\\frac{1}{2}(\\arctan x)^2\\)，极限有限，收敛" },
-            { q: "积分 \\(\\int_{0}^{+\\infty} \\frac{1}{x^{p} + x^{q}} dx\\) (0 < p < 1 < q)", opts: ["收敛", "发散"], ans: 0, exp: "拆分。在 0 附近由小次幂 p 主导（因为 x趋于0时，小次幂更大），p<1收敛。在无穷远由大次幂 q 主导，q>1收敛。整体收敛。" },
-            { q: "积分 \\(\\int_{1}^{+\\infty} x^n e^{-\\sqrt{x}} dx\\) (n>0)", opts: ["收敛", "发散"], ans: 0, exp: "换元或直接阶数估计，指数衰减强于任何次幂，收敛" },
-            { q: "积分 \\(\\int_{0}^{+\\infty} e^{-x} \\cos(e^x) dx\\)", opts: ["收敛", "发散"], ans: 0, exp: "直接求出原函数 \\(\\sin(e^x)\\)，在无穷远处极限不存在，但在原积分前乘了 \\(e^{-x}\\)，换元法 \\(t=e^x\\) 变为 \\(\\int \\cos t / t^2 dt\\)，收敛" },
-            { q: "积分 \\(\\int_{0}^{1} \\frac{1}{x - \\sin x} dx\\)", opts: ["收敛", "发散"], ans: 1, exp: "瑕点在0，分母泰勒展开为 \\(x^3/6\\)，等价于 \\(6/x^3\\)，p=3>1，发散" }
-        ];
-
-        const form = document.getElementById('questions-container');
-        let questionCount = 0;
+<div id="app-container">
+    <div class="flex justify-between items-center mb-3">
+        <h1 class="text-xl font-bold text-slate-800">反常积分 50 题特训</h1>
         
-        // 动态渲染所有题目和区段标签
-        questions.forEach((q, index) => {
-            if (q.type === 'section') {
-                form.innerHTML += `<div class="section-title">${q.title}</div>`;
-            } else {
-                let optionsHtml = '';
-                q.opts.forEach((opt, optIndex) => {
-                    optionsHtml += `<label><input type="radio" name="q${questionCount}" value="${optIndex}"> ${opt}</label>`;
-                });
-                form.innerHTML += `
-                    <div class="question-card" id="card-${questionCount}">
-                        <div class="question-title">第 ${questionCount + 1} 题: ${q.q}</div>
-                        <div class="options">${optionsHtml}</div>
-                    </div>
-                `;
-                q.realIndex = questionCount; // 记录题目在可答题中的索引
-                questionCount++;
+        <!-- 进度与导航按钮 -->
+        <div class="flex items-center gap-2">
+            <span id="progress-text" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">1 / 50</span>
+            <button onclick="toggleNavModal()" class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition flex items-center gap-1.5 shadow-sm border border-blue-100">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+                选题面板
+            </button>
+        </div>
+    </div>
+    
+    <div class="progress-bar-bg">
+        <div id="progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+    </div>
+
+    <!-- 答题卡片 -->
+    <div id="quiz-card" class="card relative">
+        <div id="question-content" class="question-text"></div>
+        <div id="options-container"></div>
+        <div id="explanation">
+            <div class="font-bold text-blue-800 mb-2 flex items-center">
+                <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                教练解析
+            </div>
+            <div id="explanation-text" class="text-sm text-blue-900 leading-relaxed"></div>
+        </div>
+        <div class="nav-buttons">
+            <button id="btn-prev" class="nav-btn btn-secondary" onclick="prevQuestion()">← 上一题</button>
+            <button id="btn-next" class="nav-btn btn-primary" onclick="nextQuestion()" disabled>下一题 →</button>
+        </div>
+    </div>
+
+    <!-- 结算卡片 -->
+    <div id="result-card" class="card hidden text-center py-10">
+        <h2 class="text-3xl font-bold text-slate-800 mb-4">特训完成！</h2>
+        <p class="text-slate-500 mb-8">本次反常积分专项训练得分：</p>
+        <div class="text-6xl font-black text-blue-600 mb-4" id="final-score">0</div>
+        <p id="result-comment" class="text-lg font-medium text-slate-700 mb-8"></p>
+        <div class="flex justify-center gap-4">
+            <button class="nav-btn btn-secondary" onclick="restartTraining()">清空记录并重练</button>
+            <a href="methods.html" class="nav-btn btn-primary">返回方法指南</a>
+        </div>
+    </div>
+</div>
+
+<!-- 选题导航弹窗 Modal -->
+<div id="nav-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center modal-hidden">
+    <div id="nav-modal-content" class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800">题目导航板</h3>
+            <button onclick="toggleNavModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <div class="flex gap-4 mb-4 text-xs text-slate-500 justify-center">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-200"></span> 未答</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-400"></span> 正确</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-400"></span> 错误</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-white border-2 border-blue-500"></span> 当前</span>
+        </div>
+
+        <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 overflow-y-auto pr-2 pb-2">
+            <!-- 动态生成 50 个按钮 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // 50道高频反常积分题库
+    const questions = [
+        // 第一阶段：基础 p-积分判别 (1-10)
+        { question: "判断无穷积分 $\\int_{1}^{+\\infty} \\frac{1}{x^p} dx$ 的敛散性：", options: ["当 $p > 1$ 时收敛，当 $p \\le 1$ 时发散", "当 $p \\ge 1$ 时收敛，当 $p < 1$ 时发散", "始终收敛", "始终发散"], correctIndex: 0, explanation: "这是无穷积分最核心的 p-积分判别尺度。对于无穷区间，指数 p 必须严格大于 1 才能收敛。" },
+        { question: "判断瑕积分 $\\int_{0}^{1} \\frac{1}{x^p} dx$ 的敛散性：", options: ["当 $p > 1$ 时收敛", "当 $p < 1$ 时收敛，当 $p \\ge 1$ 时发散", "始终收敛", "始终发散"], correctIndex: 1, explanation: "奇点在 $x=0$。对于瑕积分，指数 p 必须严格小于 1 才能收敛，与无穷积分条件正好相反。" },
+        { question: "判断无穷积分 $\\int_{e}^{+\\infty} \\frac{1}{x \\ln^p x} dx$ 的敛散性：", options: ["$p > 1$ 收敛", "$p < 1$ 收敛", "$p > 0$ 收敛", "发散"], correctIndex: 0, explanation: "利用换元法令 $t = \\ln x$，$dt = \\frac{1}{x} dx$，积分变为 $\\int_{1}^{+\\infty} \\frac{1}{t^p} dt$，由 p-积分知 $p>1$ 收敛。" },
+        { question: "瑕积分 $\\int_{0}^{1/e} \\frac{1}{x |\\ln x|^p} dx$ 的敛散性：", options: ["$p > 1$ 收敛", "$p < 1$ 收敛", "始终收敛", "始终发散"], correctIndex: 0, explanation: "同样换元 $t = -\\ln x$，转为无穷积分，得 $p > 1$ 收敛。注意这里 $x \\to 0$ 是瑕点。" },
+        { question: "无穷积分 $\\int_{2}^{+\\infty} \\frac{1}{x^2 \\ln x} dx$ 的敛散性：", options: ["发散", "条件收敛", "收敛", "震荡"], correctIndex: 2, explanation: "因为 $\\frac{1}{x^2 \\ln x} < \\frac{1}{x^2}$ (当 $x>e$ 时)，而 $\\int \\frac{1}{x^2} dx$ 收敛，由比较判别法，原积分收敛。" },
+        { question: "积分 $\\int_{1}^{+\\infty} \\frac{x^2}{1+x^4} dx$ 的敛散性：", options: ["发散", "条件收敛", "绝对收敛", "无法判定"], correctIndex: 2, explanation: "当 $x \\to \\infty$ 时，$\\frac{x^2}{1+x^4} \\sim \\frac{1}{x^2}$，$p=2>1$，故收敛且被积函数为正，即绝对收敛。" },
+        { question: "判断积分 $\\int_{0}^{+\\infty} \\frac{1}{\\sqrt{x^3+1}} dx$ 的敛散性：", options: ["发散", "条件收敛", "绝对收敛", "发散于无穷"], correctIndex: 2, explanation: "拆分为 $\\int_0^1$ 和 $\\int_1^\\infty$。前者无瑕点连续；后者 $x \\to \\infty$ 时 $\\sim \\frac{1}{x^{3/2}}$，$p=1.5>1$ 收敛。" },
+        { question: "判断积分 $\\int_{0}^{1} \\frac{1}{\\sqrt{1-x^2}} dx$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "瑕点在 $x=0$ 发散"], correctIndex: 1, explanation: "瑕点在 $x=1$。$1-x^2 = (1-x)(1+x)$，当 $x \\to 1$ 时，被积函数 $\\sim \\frac{1}{\\sqrt{2}\\sqrt{1-x}}$，属于 $p=0.5<1$ 的瑕积分，收敛。" },
+        { question: "积分 $\\int_{1}^{+\\infty} \\frac{\\ln x}{x} dx$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "极限不存在"], correctIndex: 1, explanation: "被积函数 $\\frac{\\ln x}{x} > \\frac{1}{x}$ (对于 $x>e$)，而 $\\int \\frac{1}{x} dx$ 发散，故原积分发散。也可直接积出 $\\frac{1}{2}(\\ln x)^2 \\to \\infty$。" },
+        { question: "积分 $\\int_{1}^{+\\infty} \\frac{1}{x \\sqrt{\\ln x}} dx$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "绝对收敛"], correctIndex: 1, explanation: "换元 $t=\\ln x$，变为 $\\int \\frac{1}{\\sqrt{t}} dt$ ($p=0.5 \\le 1$)，无穷积分发散。" },
+
+        // 第二阶段：极限比较与等价无穷小 (11-20)
+        { question: "判断 $\\int_{0}^{1} \\frac{\\sin x}{x^2} dx$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "绝对收敛"], correctIndex: 1, explanation: "瑕点在 $x=0$。当 $x \\to 0$ 时，$\\sin x \\sim x$，故被积函数 $\\sim \\frac{1}{x}$，$p=1$，瑕积分发散。" },
+        { question: "判断 $\\int_{0}^{1} \\frac{1-\\cos x}{x^3} dx$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "无法判断"], correctIndex: 1, explanation: "瑕点 $x=0$。当 $x \\to 0$ 时，$1-\\cos x \\sim \\frac{1}{2}x^2$，被积函数 $\\sim \\frac{1}{2x}$，$p=1$，发散。" },
+        { question: "积分 $\\int_{0}^{+\\infty} x e^{-x} dx$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "无界"], correctIndex: 1, explanation: "指数衰减压制一切多项式增长。利用极限形式比较判别法，$\\lim_{x\\to\\infty} x^2 (x e^{-x}) = 0$，且 $\\int \\frac{1}{x^2} dx$ 收敛，故原积分收敛。" },
+        { question: "判断 $\\int_{0}^{1} \\frac{\\ln(1+x)}{x\\sqrt{x}} dx$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "无瑕点"], correctIndex: 0, explanation: "瑕点 $x=0$。$\\ln(1+x) \\sim x$，被积函数 $\\sim \\frac{x}{x^{1.5}} = \\frac{1}{x^{0.5}}$，$p=0.5<1$，瑕积分收敛。" },
+        { question: "判断 $\\int_{0}^{+\\infty} \\frac{\\arctan x}{x^{3/2}} dx$ 的敛散性：", options: ["收敛", "在 $x=0$ 发散", "在 $+\\infty$ 发散", "两端均发散"], correctIndex: 0, explanation: "拆分为 $x \\to 0$ 和 $x \\to \\infty$。$x \\to 0$ 时 $\\sim \\frac{x}{x^{1.5}} = \\frac{1}{x^{0.5}}$ (收敛)。$x \\to \\infty$ 时 $\\sim \\frac{\\pi/2}{x^{1.5}}$ (收敛)。全区间收敛。" },
+        { question: "积分 $\\int_{0}^{+\\infty} \\frac{x}{e^{x^2}} dx$：", options: ["发散", "收敛", "条件收敛", "无法求原函数"], correctIndex: 1, explanation: "可以直接求出原函数 $-\\frac{1}{2} e^{-x^2}$，代入上下限结果为 $1/2$，收敛。" },
+        { question: "判断 $\\int_{1}^{+\\infty} \\left(1 - \\cos\\frac{1}{x}\\right) dx$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "绝对收敛"], correctIndex: 1, explanation: "当 $x \\to \\infty$ 时，$\\frac{1}{x} \\to 0$，$1 - \\cos\\frac{1}{x} \\sim \\frac{1}{2x^2}$。因为 $p=2>1$，无穷积分收敛。" },
+        { question: "积分 $\\int_{0}^{\\pi/2} \\ln(\\sin x) dx$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "奇点在 $\\pi/2$"], correctIndex: 1, explanation: "经典积分，瑕点在 $x=0$。当 $x \\to 0$ 时，$\\ln(\\sin x) \\sim \\ln x$，而 $\\int_0 \\ln x dx$ 收敛，故原积分收敛（其值为 $-\\frac{\\pi}{2}\\ln 2$）。" },
+        { question: "判断 $\\int_{0}^{1} \\frac{dx}{e^x - 1}$ 的敛散性：", options: ["收敛", "发散", "条件收敛", "没有瑕点"], correctIndex: 1, explanation: "瑕点 $x=0$。当 $x \\to 0$ 时，$e^x - 1 \\sim x$，被积函数 $\\sim \\frac{1}{x}$，$p=1$，瑕积分发散。" },
+        { question: "积分 $\\int_{1}^{+\\infty} \\frac{dx}{x \\sqrt[3]{x^2+1}}$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "绝对收敛"], correctIndex: 1, explanation: "当 $x \\to \\infty$ 时，被积函数 $\\sim \\frac{1}{x \\cdot x^{2/3}} = \\frac{1}{x^{5/3}}$。$p=5/3>1$，收敛。" },
+
+        // 第三阶段：狄利克雷与阿贝尔 (21-30)
+        { question: "狄利克雷(Dirichlet)判别法的条件之一是 $\\int_a^A f(x) dx$：", options: ["绝对收敛", "条件收敛", "有界", "趋于0"], correctIndex: 2, explanation: "狄利克雷要求 $f(x)$ 的变上限积分在 $[a, +\\infty)$ 上一致有界，而 $g(x)$ 单调趋于0。" },
+        { question: "阿贝尔(Abel)判别法的条件之一是 $g(x)$：", options: ["单调趋于0", "单调有界", "有界但不一定单调", "绝对可积"], correctIndex: 1, explanation: "阿贝尔要求 $\\int f(x) dx$ 已经收敛，此时对 $g(x)$ 的要求放宽为只需“单调有界”即可。" },
+        { question: "积分 $\\int_{1}^{+\\infty} \\frac{\\sin x}{x} dx$ 收敛的依据是：", options: ["比较判别法", "狄利克雷判别法", "阿贝尔判别法", "柯西准则"], correctIndex: 1, explanation: "令 $f(x)=\\sin x$，其积分有界；$g(x)=\\frac{1}{x}$ 单调递减趋于0。完美符合狄利克雷判别法。" },
+        { question: "判断 $\\int_{1}^{+\\infty} \\frac{\\cos x}{\\sqrt{x}} dx$ 的敛散性：", options: ["发散", "绝对收敛", "条件收敛", "需要更多信息"], correctIndex: 2, explanation: "由狄利克雷判别法收敛。但取绝对值后 $\\left| \\frac{\\cos x}{\\sqrt{x}} \\right| \\ge \\frac{\\cos^2 x}{\\sqrt{x}} = \\frac{1+\\cos(2x)}{2\\sqrt{x}}$，其中 $\\frac{1}{2\\sqrt{x}}$ 发散，故原积分条件收敛。" },
+        { question: "积分 $\\int_{1}^{+\\infty} e^{-x} \\frac{\\sin x}{x} dx$ 收敛的最快判定依据：", options: ["阿贝尔判别法", "狄利克雷判别法", "直接绝对收敛", "发散"], correctIndex: 2, explanation: "因为 $|e^{-x} \\frac{\\sin x}{x}| \\le e^{-x}$，而 $\\int e^{-x} dx$ 收敛，由比较法即知其绝对收敛。无需杀鸡用牛刀。" },
+        { question: "若已知 $\\int_{1}^{+\\infty} \\frac{\\sin x}{x} dx$ 收敛，判断 $\\int_{1}^{+\\infty} \\frac{\\sin x}{x} \\arctan x dx$：", options: ["发散", "收敛", "条件收敛", "绝对收敛"], correctIndex: 1, explanation: "利用阿贝尔判别法。已知 $\\frac{\\sin x}{x}$ 积分收敛，且 $g(x) = \\arctan x$ 在 $[1, +\\infty)$ 上单调增加且有界（$\\le \\pi/2$），故原积分收敛。" },
+        { question: "判断 $\\int_{2}^{+\\infty} \\frac{\\sin x}{\\ln x} dx$ 的敛散性：", options: ["条件收敛", "绝对收敛", "发散", "无界"], correctIndex: 0, explanation: "狄利克雷判别法：$f(x)=\\sin x$ 积分有界，$g(x)=1/\\ln x$ 单调趋于0，收敛。但加绝对值后发散，故条件收敛。" },
+        { question: "以下哪个函数不能作为狄利克雷判别法中的 $f(x)$ (积分有界)？", options: ["$\\sin x$", "$\\cos 3x$", "$1$", "$\\sin x - \\cos x$"], correctIndex: 2, explanation: "常数 $1$ 的变上限积分是 $x$，当 $x \\to \\infty$ 时无界，不满足狄利克雷条件。" },
+        { question: "判断 $\\int_{1}^{+\\infty} \\sin(x^2) dx$ 的敛散性：", options: ["发散", "收敛", "条件收敛", "无界"], correctIndex: 1, explanation: "菲涅尔积分。令 $t=x^2$，变为 $\\int_{1}^{+\\infty} \\frac{\\sin t}{2\\sqrt{t}} dt$。由狄利克雷判别法知其收敛。" },
+        { question: "判断 $\\int_{1}^{+\\infty} \\frac{x \\sin x}{1+x^2} dx$：", options: ["发散", "收敛", "绝对收敛", "发散到 $+\\infty$"], correctIndex: 1, explanation: "$\\frac{x}{1+x^2}$ 单调趋于0（对充分大的x），$\\sin x$ 积分有界，狄利克雷判别法判定收敛。" },
+
+        // 第四阶段：绝对与条件收敛深度辨析 (31-40)
+        { question: "若 $\\int_{a}^{+\\infty} |f(x)| dx$ 收敛，则 $\\int_{a}^{+\\infty} f(x) dx$：", options: ["必然收敛", "必然发散", "可能收敛", "必须连续"], correctIndex: 0, explanation: "绝对收敛必收敛。这是反常积分的一个基本定理。" },
+        { question: "若 $\\int_{a}^{+\\infty} f(x) dx$ 收敛，则 $\\int_{a}^{+\\infty} |f(x)| dx$：", options: ["必然收敛", "必然发散", "不一定收敛", "必然为0"], correctIndex: 2, explanation: "收敛不一定绝对收敛，也可能是条件收敛（例如 $\\frac{\\sin x}{x}$）。" },
+        { question: "判断 $\\int_{1}^{+\\infty} \\frac{\\cos x}{x^2} dx$：", options: ["条件收敛", "绝对收敛", "发散", "无极限"], correctIndex: 1, explanation: "加绝对值后 $\\le \\frac{1}{x^2}$，由比较判别法知绝对收敛。" },
+        { question: "判断 $\\int_{0}^{+\\infty} \\cos(x^2) dx$：", options: ["绝对收敛", "条件收敛", "发散", "无穷极小"], correctIndex: 1, explanation: "和 $\\sin(x^2)$ 类似，换元后用狄利克雷可知收敛；但取绝对值后利用 $\\cos^2(x^2) = \\frac{1+\\cos(2x^2)}{2}$ 拆分，积分发散。故为条件收敛。" },
+        { question: "判断 $\\int_{2}^{+\\infty} \\frac{(-1)^{[x]}}{\\ln x} dx$ (其中 $[x]$ 为取整函数)：", options: ["绝对收敛", "条件收敛", "发散", "积分不存在"], correctIndex: 1, explanation: "$(-1)^{[x]}$ 是阶梯状交错函数，其变上限积分在 $0$ 和 $1$ 之间震荡（有界）。而 $1/\\ln x$ 单调趋于0。由狄利克雷判别法收敛。绝对值后发散。" },
+        { question: "积分 $\\int_{0}^{+\\infty} \\frac{\\sin x}{x^p} dx$ 绝对收敛的 $p$ 的范围是：", options: ["$p > 0$", "$1 < p < 2$", "$0 < p < 1$", "$p > 1$"], correctIndex: 1, explanation: "大坑！需同时考虑 $\\infty$ (要求 $p>1$ 压住绝对值) 和 $0$ (要求 $p<2$ 因为 $\\sin x \\sim x$ 抵消一次幂)。两者交集为 $1 < p < 2$。" },
+        { question: "积分 $\\int_{0}^{+\\infty} \\frac{\\sin x}{x^p} dx$ 条件收敛的 $p$ 的范围是：", options: ["$0 < p < 1$", "$p > 1$", "$0 < p \\le 1$", "$1 \\le p < 2$"], correctIndex: 2, explanation: "在 $+\\infty$ 处，狄利克雷法仅需 $p>0$ 即可收敛，但 $p \\le 1$ 时绝对值发散。结合 $x=0$ 处 $p<2$ 的无瑕/收敛条件，条件收敛段为 $0 < p \\le 1$。" },
+        { question: "要使 $\\int_{1}^{+\\infty} \\frac{P(x)}{Q(x)} dx$ 收敛（P,Q为多项式，Q无实根），度数需满足：", options: ["deg(Q) > deg(P)", "deg(Q) - deg(P) \\ge 2", "deg(Q) - deg(P) = 1", "deg(P) > deg(Q)"], correctIndex: 1, explanation: "当 $x \\to \\infty$ 时，多项式之比等价于最高次项之比 $1/x^{deg(Q)-deg(P)}$。无穷积分收敛要求该差值严格 $>1$，即整数差 $\\ge 2$。" },
+        { question: "若 $f(x)$ 连续，且 $\\lim_{x \\to \\infty} f(x) = c \\neq 0$，则 $\\int_{a}^{+\\infty} f(x) dx$：", options: ["收敛", "发散", "条件收敛", "依赖于a"], correctIndex: 1, explanation: "反常积分收敛的必要条件是：如果极限存在，则必须为0。不为0必发散（曲线末端包围无穷面积）。" },
+        { question: "判断 $\\int_{0}^{1} x^a \\ln x dx$ 收敛的条件：", options: ["$a > 0$", "$a > -1$", "$a < 0$", "任意 $a$ 均收敛"], correctIndex: 1, explanation: "奇点在 $0$。当 $a > -1$ 时，可取 $p$ 使得 $1 < p < a+2$，此时 $\\lim_{x\\to0} x^p |x^a \\ln x| = 0$，由比较法知收敛。用分部积分也能直接求出。" },
+
+        // 第五阶段：综合应用与Gamma/Beta函数 (41-50)
+        { question: "判断 $\\int_{0}^{+\\infty} \\frac{x^{p-1}}{1+x} dx$ 收敛的 $p$ 范围：", options: ["$p > 0$", "$p < 1$", "$0 < p < 1$", "$p > 1$"], correctIndex: 2, explanation: "拆分为0到1和1到无穷。$x \\to 0$ 时 $\\sim x^{p-1}$，需 $p-1 > -1$ 即 $p>0$。$x \\to \\infty$ 时 $\\sim x^{p-2}$，需 $2-p > 1$ 即 $p<1$。交集 $0<p<1$。" },
+        { question: "伽马函数 $\\Gamma(s) = \\int_{0}^{+\\infty} x^{s-1} e^{-x} dx$ 的收敛域是：", options: ["$s \\ge 1$", "$s > 0$", "所有实数", "$s < 1$"], correctIndex: 1, explanation: "$x \\to \\infty$ 端指数衰减极快，对任何 $s$ 均收敛；$x \\to 0$ 端 $\\sim x^{s-1}$，需 $1-s < 1$ 即 $s>0$ 瑕积分才收敛。" },
+        { question: "对于 $\\int_{1}^{+\\infty} \\frac{\\sin x}{x} dx$ 与 $\\int_{1}^{+\\infty} \\left| \\frac{\\sin x}{x} \\right| dx$：", options: ["均收敛", "均发散", "前者收敛，后者发散", "前者发散，后者收敛"], correctIndex: 2, explanation: "条件收敛的最典型代表。前者由狄利克雷判别法收敛，后者由于 $\\ge \\frac{\\sin^2 x}{x} = \\frac{1-\\cos 2x}{2x}$ 发散。" },
+        { question: "判断 $\\int_{0}^{+\\infty} e^{-ax^2} dx \\ (a>0)$ 的值：", options: ["$\\frac{\\pi}{a}$", "$\\sqrt{\\frac{\\pi}{a}}$", "$\\frac{1}{2}\\sqrt{\\frac{\\pi}{a}}$", "发散"], correctIndex: 2, explanation: "利用泊松积分 $\\int_0^\\infty e^{-x^2} dx = \\sqrt{\\pi}/2$，换元 $t = \\sqrt{a}x$ 即可得结论。" },
+        { question: "判断 $\\int_{0}^{\\pi/2} \\frac{1}{\\sin^p x} dx$ 收敛的 $p$ 范围：", options: ["$p > 1$", "$p < 1$", "$p > 0$", "$p \\ge 1$"], correctIndex: 1, explanation: "奇点在 $x=0$。当 $x \\to 0$ 时 $\\sin x \\sim x$，积分等价于 $\\int \\frac{1}{x^p} dx$，瑕积分要求 $p<1$ 收敛。" },
+        { question: "若 $\\int_a^{+\\infty} f(x)dx$ 与 $\\int_a^{+\\infty} g(x)dx$ 均收敛，则 $\\int_a^{+\\infty} f(x)g(x) dx$：", options: ["必然收敛", "必然发散", "不一定收敛", "必须要求 $f,g>0$ 才收敛"], correctIndex: 2, explanation: "反例：$f(x)=g(x)=\\frac{\\sin x}{\\sqrt{x}}$。两者的单积均由狄利克雷收敛，但乘积变为 $\\frac{\\sin^2 x}{x}$，积分发散！" },
+        { question: "判断 $\\int_{0}^{+\\infty} \\sin(x^3) dx$：", options: ["收敛", "发散", "条件收敛", "无意义"], correctIndex: 2, explanation: "换元 $t=x^3$，变为 $\\int \\frac{\\sin t}{3 t^{2/3}} dt$。由狄利克雷判别法收敛，且为条件收敛。" },
+        { question: "判断 $\\int_{0}^{+\\infty} \\frac{\\cos(x) - e^{-x}}{x} dx$：", options: ["发散", "绝对收敛", "条件收敛", "在 $x=0$ 处发散"], correctIndex: 2, explanation: "$x=0$ 不是奇点（洛必达极限定为 0）。在无穷远处，拆分为 $\\frac{\\cos x}{x}$ (条件收敛) 和 $\\frac{e^{-x}}{x}$ (绝对收敛)，故整体条件收敛。" },
+        { question: "如果被积函数 $f(x)$ 含有周期性震荡因子（如 $\\sin(\\ln x)$），它：", options: ["积分必发散", "积分必收敛", "不能用狄利克雷，因其积分无界", "适用所有判别法"], correctIndex: 2, explanation: "$\\sin(\\ln x)$ 的积分无界，因此无法使用狄利克雷判别法。对于 $\\int \\frac{\\sin(\\ln x)}{x} dx$ 这种，换元 $t=\\ln x$ 会发现它发散。" },
+        { question: "反常积分终极心法：遇到 $\\int_{0}^{+\\infty}$ 时，必须：", options: ["只看无穷远处", "只看0点处", "在任意中点拆分，分别考察瑕积分和无穷积分", "直接求导"], correctIndex: 2, explanation: "这是最易错的一环。全区间积分收敛的充要条件是：拆分出的每个瑕积分和无穷积分都必须各自收敛，不能相互抵消！" }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    const STORAGE_KEY = 'math_integral_50_progress';
+
+    const ui = {
+        questionContent: document.getElementById('question-content'),
+        optionsContainer: document.getElementById('options-container'),
+        explanation: document.getElementById('explanation'),
+        explanationText: document.getElementById('explanation-text'),
+        btnNext: document.getElementById('btn-next'),
+        btnPrev: document.getElementById('btn-prev'),
+        progressText: document.getElementById('progress-text'),
+        progressFill: document.getElementById('progress-fill'),
+        quizCard: document.getElementById('quiz-card'),
+        resultCard: document.getElementById('result-card'),
+        finalScore: document.getElementById('final-score'),
+        resultComment: document.getElementById('result-comment'),
+        navModal: document.getElementById('nav-modal'),
+        navGrid: document.getElementById('nav-grid')
+    };
+
+    function init() {
+        // 读取本地缓存进度
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                if (parsed.userAnswers && parsed.userAnswers.length === questions.length) {
+                    userAnswers = parsed.userAnswers;
+                    score = parsed.score || 0;
+                    currentIndex = parsed.currentIndex || 0;
+                }
+            } catch (e) {
+                console.error('Failed to parse saved progress', e);
+            }
+        }
+        renderQuestion(currentIndex);
+    }
+
+    function saveProgress() {
+        const data = {
+            currentIndex: currentIndex,
+            score: score,
+            userAnswers: userAnswers
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function renderQuestion(index) {
+        const q = questions[index];
+        ui.progressText.innerText = `${index + 1} / ${questions.length}`;
+        ui.progressFill.style.width = `${((index + 1) / questions.length) * 100}%`;
+        ui.questionContent.innerHTML = `<strong>Q${index + 1}.</strong> ${q.question}`;
+        ui.optionsContainer.innerHTML = '';
+        
+        q.options.forEach((opt, optIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = opt;
+            btn.onclick = () => handleSelection(optIdx);
+            ui.optionsContainer.appendChild(btn);
+        });
+
+        ui.explanation.style.display = 'none';
+        ui.btnPrev.disabled = (index === 0);
+        
+        if (userAnswers[index] !== null) {
+            restoreAnswerState(index);
+        } else {
+            ui.btnNext.disabled = true; 
+        }
+
+        if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+            MathJax.typesetPromise([ui.quizCard]).catch((err) => console.log(err.message));
+        }
+        
+        saveProgress(); // 每次渲染/跳转时保存当前位置
+    }
+
+    function handleSelection(selectedIndex) {
+        if (userAnswers[currentIndex] !== null) return; 
+        const q = questions[currentIndex];
+        const isCorrect = (selectedIndex === q.correctIndex);
+        userAnswers[currentIndex] = { selected: selectedIndex, isCorrect: isCorrect };
+        if (isCorrect) score++;
+        saveProgress(); // 答题后保存记录
+        restoreAnswerState(currentIndex);
+    }
+
+    function restoreAnswerState(index) {
+        const q = questions[index];
+        const answerData = userAnswers[index];
+        const buttons = ui.optionsContainer.querySelectorAll('.option-btn');
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true; 
+            if (idx === q.correctIndex) {
+                btn.classList.add('correct'); 
+            } else if (idx === answerData.selected && !answerData.isCorrect) {
+                btn.classList.add('wrong'); 
             }
         });
 
-        function submitQuiz() {
-            let score = 0;
-            let mistakesHtml = '';
-            let allAnswered = true;
-            let answeredCount = 0;
-
-            questions.forEach((q) => {
-                if (q.type === 'section') return;
-                
-                let idx = q.realIndex;
-                const selected = document.querySelector(`input[name="q${idx}"]:checked`);
-                const card = document.getElementById(`card-${idx}`);
-                
-                if (!selected) {
-                    allAnswered = false;
-                    card.style.borderLeft = "4px solid #f1c40f";
-                    card.style.backgroundColor = "#fff9e6";
-                } else {
-                    answeredCount++;
-                    card.style.borderLeft = "4px solid #bdc3c7";
-                    card.style.backgroundColor = "white";
-                    
-                    if (parseInt(selected.value) === q.ans) {
-                        score++;
-                        card.style.border = "2px solid #2ecc71";
-                    } else {
-                        card.style.border = "2px solid #e74c3c";
-                        mistakesHtml += `
-                            <div class="mistake-card">
-                                <div class="mistake-header">
-                                    <strong>❌ 第 ${idx + 1} 题</strong>
-                                </div>
-                                <div><strong>考题:</strong> ${q.q}</div>
-                                <div style="margin-top: 10px;">
-                                    <span style="color:#7f8c8d; text-decoration: line-through;">你的回答: ${q.opts[parseInt(selected.value)]}</span><br>
-                                    <strong style="color:#27ae60;">正确答案: ${q.opts[q.ans]}</strong>
-                                </div>
-                                <div class="explanation"><strong>教练拆解 🛠️：</strong>${q.exp}</div>
-                            </div>
-                        `;
-                    }
-                }
-            });
-
-            if (!allAnswered) {
-                alert(`教练提醒：你只做了 ${answeredCount} 题，还有 ${questionCount - answeredCount} 题没做！注意黄色高亮的题目。静下心来，把它做完！`);
-                return;
-            }
-
-            document.getElementById('score').innerText = score;
-            const mistakesContainer = document.getElementById('mistakes-container');
-            const comment = document.getElementById('score-comment');
-            
-            if (score === questionCount) {
-                comment.innerHTML = "<span style='color: #27ae60;'>完美！你的基础和过程严谨度已无可挑剔，准备迎接竞赛的洗礼吧！</span>";
-                mistakesContainer.innerHTML = "";
-            } else if (score >= 40) {
-                comment.innerHTML = "优秀！绝大部分陷阱你都避开了，查漏补缺一下错题即可。";
-                mistakesContainer.innerHTML = mistakesHtml;
-            } else if (score >= 30) {
-                comment.innerHTML = "底子不错，但在过程推理（如判别法条件的验证、极限收敛深度的理解）上还有模糊地带，仔细看教练解析！";
-                mistakesContainer.innerHTML = mistakesHtml;
-            } else {
-                comment.innerHTML = "<span style='color: #c0392b;'>警报响起！基础概念存在较多混淆（尤其是瑕积分与无穷积分的条件反转）。建议先重点看错题本前15题的过程拆解！</span>";
-                mistakesContainer.innerHTML = mistakesHtml;
-            }
-
-            document.getElementById('result-section').style.display = 'block';
-            MathJax.typesetPromise();
-            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('submit-btn').style.display = 'none';
+        ui.explanationText.innerHTML = q.explanation;
+        ui.explanation.style.display = 'block';
+        ui.btnNext.disabled = false;
+        
+        if (index === questions.length - 1) {
+            ui.btnNext.innerText = "查看特训报告 →";
+        } else {
+            ui.btnNext.innerText = "下一题 →";
         }
-    </script>
+
+        if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+            MathJax.typesetPromise([ui.explanation]).catch(e => console.log(e));
+        }
+    }
+
+    function nextQuestion() {
+        if (currentIndex === questions.length - 1) {
+            showResults();
+        } else {
+            currentIndex++;
+            renderQuestion(currentIndex);
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion(currentIndex);
+        }
+    }
+
+    // ==========================================
+    // 选题导航面板逻辑
+    // ==========================================
+    let isNavModalOpen = false;
+
+    function toggleNavModal() {
+        isNavModalOpen = !isNavModalOpen;
+        if (isNavModalOpen) {
+            renderNavGrid();
+            ui.navModal.classList.remove('modal-hidden');
+        } else {
+            ui.navModal.classList.add('modal-hidden');
+        }
+    }
+
+    function renderNavGrid() {
+        ui.navGrid.innerHTML = '';
+        for (let i = 0; i < questions.length; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i + 1;
+            
+            // 基础样式
+            btn.className = `w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center font-bold text-sm transition-all border-2 `;
+            
+            // 根据答题状态涂色
+            if (userAnswers[i] !== null) {
+                if (userAnswers[i].isCorrect) {
+                    btn.className += 'bg-emerald-100 border-emerald-400 text-emerald-700 ';
+                } else {
+                    btn.className += 'bg-red-100 border-red-400 text-red-700 ';
+                }
+            } else {
+                btn.className += 'bg-slate-50 border-slate-200 text-slate-500 hover:border-blue-300 ';
+            }
+
+            // 当前题目高亮框
+            if (i === currentIndex) {
+                btn.className += 'ring-2 ring-offset-2 ring-blue-500 border-blue-500 bg-white ';
+                if (userAnswers[i] === null) btn.classList.remove('bg-slate-50', 'border-slate-200'); // 如果是当前题且没答，覆盖底色
+            }
+
+            btn.onclick = () => {
+                jumpToQuestion(i);
+            };
+            ui.navGrid.appendChild(btn);
+        }
+    }
+
+    function jumpToQuestion(index) {
+        currentIndex = index;
+        toggleNavModal(); // 关闭面板
+        renderQuestion(currentIndex); // 跳转
+    }
+
+    function showResults() {
+        ui.quizCard.classList.add('hidden');
+        ui.resultCard.classList.remove('hidden');
+        ui.finalScore.innerText = `${score} / ${questions.length}`;
+        
+        const accuracy = score / questions.length;
+        if (accuracy === 1) {
+            ui.resultComment.innerHTML = "完美满分！你的反常积分判别内功已臻化境！";
+            ui.resultComment.className = "text-lg font-medium text-emerald-600 mb-8";
+        } else if (accuracy >= 0.8) {
+            ui.resultComment.innerHTML = "极其优秀！绝大部分陷阱你都成功闪避了。";
+            ui.resultComment.className = "text-lg font-medium text-blue-600 mb-8";
+        } else if (accuracy >= 0.6) {
+            ui.resultComment.innerHTML = "功底尚可，但在绝对收敛与条件收敛的判别上还需仔细推敲解析。";
+            ui.resultComment.className = "text-lg font-medium text-amber-600 mb-8";
+        } else {
+            ui.resultComment.innerHTML = "警报！概念存在严重混淆，请重温 p-积分标准与奇点拆解法则。";
+            ui.resultComment.className = "text-lg font-medium text-red-600 mb-8";
+        }
+    }
+
+    function restartTraining() {
+        if(confirm("确定要清空所有做题记录重新开始吗？")) {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+    }
+
+    init();
+</script>
+
 </body>
 </html>
