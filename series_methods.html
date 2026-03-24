@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数项级数：完全指南</title>
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], tags: 'ams' },
+      chtml: { matchFontHeight: true, mtextInheritFont: true }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc; --surface: #fff; --text: #1e293b; --text-dim: #64748b;
+            --blue: #2563eb; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+            --green: #059669; --green-bg: #ecfdf5; --green-border: #a7f3d0;
+            --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+            --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+            --red: #dc2626; --red-bg: #fef2f2; --red-border: #fecaca;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif;
+            line-height: 1.8; color: var(--text); background: var(--bg);
+            max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; font-size: 16px;
+        }
+        h1 { text-align: center; font-size: 2em; font-weight: 700; border-bottom: 3px solid var(--blue); padding-bottom: 16px; margin-bottom: 12px; }
+        .page-subtitle { text-align: center; color: var(--text-dim); margin-bottom: 50px; font-size: 0.95em; }
+        h2 { color: var(--blue); margin-top: 56px; font-size: 1.35em; font-weight: 700; border-left: 5px solid var(--blue); padding: 10px 16px; background: var(--blue-bg); border-radius: 0 8px 8px 0; }
+        h3 { color: var(--green); margin-top: 32px; font-size: 1.15em; font-weight: 700; }
+        h4 { color: var(--purple); margin-top: 24px; font-size: 1.05em; font-weight: 700; }
+        p { margin: 10px 0; }
+        .box { background: var(--surface); padding: 20px 24px; margin: 20px 0; border-radius: 0 10px 10px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .box-def { border-left: 5px solid var(--blue); }
+        .box-thm { border-left: 5px solid var(--green); }
+        .box-tech { border-left: 5px solid var(--purple); }
+        .box-warn { border-left: 5px solid var(--amber); background: var(--amber-bg); }
+        .box-danger { border-left: 5px solid var(--red); background: var(--red-bg); }
+        .box-beyond { border-left: 5px solid #0891b2; background: #ecfeff; }
+        .box-label { font-weight: 700; margin-bottom: 10px; font-size: 1.05em; display: flex; align-items: center; gap: 8px; }
+        .box-def .box-label { color: var(--blue); } .box-thm .box-label { color: var(--green); }
+        .box-tech .box-label { color: var(--purple); } .box-warn .box-label { color: var(--amber); }
+        .box-danger .box-label { color: var(--red); } .box-beyond .box-label { color: #0891b2; }
+        .proof { background: #fafbfc; border: 1px dashed var(--border); padding: 20px 24px; margin: 16px 0; border-radius: 8px; font-size: 0.95em; }
+        .proof-title { font-weight: 700; color: var(--text-dim); margin-bottom: 10px; font-style: italic; }
+        .proof .qed { text-align: right; font-weight: 700; }
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; font-size: 0.95em; color: var(--text); transition: all 0.2s; list-style: none; }
+        details summary::-webkit-details-marker { display: none; }
+        details summary::before { content: "▸ "; color: var(--blue); font-weight: 700; }
+        details[open] summary::before { content: "▾ "; }
+        details[open] summary { border-radius: 8px 8px 0 0; border-bottom-color: transparent; background: var(--blue-bg); }
+        details .proof { border-top: none; border-radius: 0 0 8px 8px; margin-top: 0; }
+        ul, ol { padding-left: 24px; margin: 8px 0; } li { margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92em; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: center; }
+        th { background: var(--blue-bg); font-weight: 700; color: var(--blue); }
+        .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 40px; }
+        .toc-title { font-weight: 700; font-size: 1.1em; margin-bottom: 12px; }
+        .toc a { color: var(--blue); text-decoration: none; font-size: 0.93em; } .toc a:hover { text-decoration: underline; }
+        .toc ol { padding-left: 20px; } .toc li { margin-bottom: 4px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--blue); text-decoration: none; font-weight: 600; font-size: 0.9em; }
+        .back-link:hover { text-decoration: underline; }
+        mjx-container { font-size: 105% !important; }
+        mjx-container[display="true"] { margin: 16px 0 !important; }
+        @media (max-width: 640px) { body { padding: 20px 14px 60px; font-size: 15px; } h1 { font-size: 1.6em; } .box, .proof { padding: 16px; } }
+    </style>
+</head>
+<body>
+
+<a href="./index.html" class="back-link">← 返回主页</a>
+
+<h1>数项级数：完全指南</h1>
+<p class="page-subtitle">Séries Numériques — 判别法体系 · 严密证明 · 高阶技巧 · 超纲拓展</p>
+
+<div class="toc">
+    <div class="toc-title">目录</div>
+    <ol>
+        <li><a href="#s1">基本概念与柯西准则</a></li>
+        <li><a href="#s2">发散的必要条件（零门槛筛查）</a></li>
+        <li><a href="#s3">正项级数：$p$-级数与积分判别法</a></li>
+        <li><a href="#s4">d'Alembert 比值法与 Cauchy 根值法</a></li>
+        <li><a href="#s5">Raabe 判别法（比值法失效时的救星）</a></li>
+        <li><a href="#s6">Cauchy 凝聚判别法</a></li>
+        <li><a href="#s7">交错级数与 Leibniz 准则</a></li>
+        <li><a href="#s8">Abel/Dirichlet 判别法（级数版）</a></li>
+        <li><a href="#s9">绝对收敛与条件收敛</a></li>
+        <li><a href="#s10">经典反例与致命陷阱</a></li>
+        <li><a href="#s11">高阶拓展：Euler 常数、Stirling 公式与 $\zeta$ 函数</a></li>
+    </ol>
+</div>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 级数与积分的桥梁</div>
+    <p>级数 $\sum a_n$ 的敛散性与积分 $\int f(x)\,dx$ 高度对应（积分判别法）。反常积分中的 $p$-积分标尺、Dirichlet/Abel 判别法在这里都有对应的离散版本。掌握一套，等于掌握两套。</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s1">第一部分：基本概念与柯西准则</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-def">
+    <div class="box-label">定义 — 级数与部分和</div>
+    <p>给定数列 $(a_n)_{n \ge 1}$，定义<strong>部分和</strong> $S_N = \sum_{n=1}^{N} a_n$。</p>
+    <p>级数 $\sum_{n=1}^{\infty} a_n$ <strong>收敛</strong>，当且仅当 $\lim_{N \to \infty} S_N$ 存在且有限。此极限称为级数的<strong>和</strong>。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 柯西收敛准则（级数版）</div>
+    <p>$\sum a_n$ 收敛 $\iff$ $\forall \varepsilon > 0$，$\exists N_0$ 使得 $\forall m > n \ge N_0$：</p>
+    $$\left|\sum_{k=n+1}^{m} a_k\right| < \varepsilon$$
+    <p>直觉：级数的「尾部片段」可以任意小。</p>
+</div>
+
+<details>
+    <summary>证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>$\sum a_n$ 收敛 $\iff$ $(S_N)$ 收敛 $\iff$ $(S_N)$ 是柯西列 $\iff$</p>
+        $$\forall \varepsilon > 0,\ \exists N_0,\ \forall m > n \ge N_0: |S_m - S_n| < \varepsilon$$
+        <p>而 $S_m - S_n = \sum_{k=n+1}^{m} a_k$，命题即得。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s2">第二部分：发散的必要条件</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 通项趋于零是收敛的必要条件</div>
+    <p>若 $\sum a_n$ 收敛，则 $\lim_{n \to \infty} a_n = 0$。</p>
+</div>
+
+<details>
+    <summary>证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>柯西准则取 $m = n+1$：$|a_{n+1}| = |S_{n+1} - S_n| < \varepsilon$（$n$ 充分大时）。故 $a_n \to 0$。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-danger">
+    <div class="box-label">💀 逆命题不成立！</div>
+    <p>$a_n \to 0$ <strong>不能</strong>保证收敛。经典反例：调和级数 $\sum 1/n$，通项趋于 0 但发散。</p>
+    <p><strong>实战价值：</strong> 逆否命题是秒杀利器——若 $a_n \not\to 0$，级数<strong>必发散</strong>。如 $\sum \cos(1/n)$：$\cos(1/n) \to 1 \neq 0$，直接判发散。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s3">第三部分：正项级数 — $p$-级数与积分判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — $p$-级数标尺 (Séries de Riemann)</div>
+    $$\sum_{n=1}^{\infty} \frac{1}{n^p} \quad \text{当且仅当 } p > 1 \text{ 时收敛}$$
+    <p>与无穷积分 $\int_1^{+\infty} 1/x^p\,dx$ 的判据完全一致。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 积分判别法 (Critère intégral)</div>
+    <p>设 $f : [1, +\infty) \to [0, +\infty)$ 连续且<strong>单调递减</strong>。则：</p>
+    $$\sum_{n=1}^{\infty} f(n) \text{ 收敛} \iff \int_1^{+\infty} f(x)\,dx \text{ 收敛}$$
+    <p>更精确地，有夹逼：$\int_1^{N+1} f \le \sum_{n=1}^N f(n) \le f(1) + \int_1^N f$。</p>
+</div>
+
+<details>
+    <summary>积分判别法的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>因 $f$ 单调递减，在 $[n, n+1]$ 上：$f(n+1) \le f(x) \le f(n)$。积分：</p>
+        $$f(n+1) \le \int_n^{n+1} f(x)\,dx \le f(n)$$
+        <p>对 $n = 1, 2, \ldots, N$ 求和：</p>
+        $$\sum_{n=2}^{N+1} f(n) \le \int_1^{N+1} f(x)\,dx \le \sum_{n=1}^{N} f(n)$$
+        <p>左侧 $= S_{N+1} - f(1)$。所以：</p>
+        $$S_{N+1} - f(1) \le \int_1^{N+1} f \le S_N$$
+        <p>若 $\int f$ 收敛（设极限为 $I$），则 $S_N \ge \int_1^{N+1} f \to I$（$S_N$ 单调递增有下界），且 $S_N \le f(1) + I$（有上界），故 $S_N$ 收敛。</p>
+        <p>若 $\int f$ 发散，则 $S_{N+1} \ge f(1) + \int_1^{N+1} f \to +\infty$，$\sum$ 发散。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">积分判别法的威力 — 证明调和级数发散</div>
+    <p>$f(x) = 1/x$，$\int_1^{+\infty} dx/x = +\infty$。由积分判别法，$\sum 1/n$ 发散。</p>
+    <p>同理可处理 Bertrand 级数 $\sum 1/(n(\ln n)^q)$：换元后化为积分判别法。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s4">第四部分：d'Alembert 与 Cauchy 判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<h3>1. d'Alembert 比值法 (Critère de d'Alembert)</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理</div>
+    <p>设 $a_n > 0$，$\displaystyle l = \lim_{n \to \infty} \frac{a_{n+1}}{a_n}$。</p>
+    <table>
+        <tr><th>$l$ 的值</th><th>结论</th></tr>
+        <tr><td>$l < 1$</td><td>$\sum a_n$ <strong>收敛</strong></td></tr>
+        <tr><td>$l > 1$</td><td>$\sum a_n$ <strong>发散</strong></td></tr>
+        <tr><td>$l = 1$</td><td><strong>无法判断！</strong></td></tr>
+    </table>
+    <p><strong>适用场景：</strong> 含 $n!$（阶乘）或 $a^n$（指数）的级数。</p>
+</div>
+
+<details>
+    <summary>d'Alembert 判别法的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明（$l < 1$ 的情形）：</div>
+        <p>取 $r$ 使 $l < r < 1$。由极限定义，$\exists N_0$ 使得 $n \ge N_0$ 时 $a_{n+1}/a_n \le r$。</p>
+        <p>递推：$a_{N_0 + k} \le r^k \cdot a_{N_0}$。</p>
+        <p>即 $a_n \le C \cdot r^n$（$n$ 充分大时），而 $\sum r^n$ 是公比 $r < 1$ 的几何级数，收敛。由比较判别法，$\sum a_n$ 收敛。</p>
+        <p><strong>$l > 1$ 的情形：</strong> 同理 $a_{n+1}/a_n \ge 1$（$n$ 大时），$a_n$ 不趋于 0，由必要条件发散。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<h3>2. Cauchy 根值法 (Critère de Cauchy / de la racine)</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理</div>
+    <p>设 $a_n \ge 0$，$\displaystyle l = \lim_{n \to \infty} \sqrt[n]{a_n}$（或 $\limsup$）。</p>
+    <ul>
+        <li>$l < 1$：收敛。</li>
+        <li>$l > 1$：发散。</li>
+        <li>$l = 1$：无法判断。</li>
+    </ul>
+    <p><strong>适用场景：</strong> 整体带 $n$ 次方的级数，如 $\left(\frac{n}{n+1}\right)^{n^2}$。</p>
+</div>
+
+<details>
+    <summary>Cauchy 根值法的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明（$l < 1$）：</div>
+        <p>取 $r$ 使 $l < r < 1$。$\exists N_0$ 使得 $n \ge N_0$ 时 $\sqrt[n]{a_n} \le r$，即 $a_n \le r^n$。由 $\sum r^n$ 收敛和比较判别法，$\sum a_n$ 收敛。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 根值法严格强于比值法</div>
+    <p>若比值法极限 $l$ 存在，则根值法极限也存在且相等。但根值法极限可能存在而比值法极限不存在。</p>
+    <p><strong>例：</strong> $a_n = 2^{-n}$（$n$ 奇）、$a_n = 3^{-n}$（$n$ 偶）。比值 $a_{n+1}/a_n$ 在 $2/3$ 和 $3/2$ 之间交替，极限不存在。但 $\sqrt[n]{a_n} \to 1/\sqrt{6} < 1$（存在），根值法可判收敛。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 $l = 1$ 时两法均失效</div>
+    <p>$\sum 1/n$（发散）和 $\sum 1/n^2$（收敛）的比值极限和根值极限都是 $1$。遇到 $l = 1$，必须换用比较判别法、Raabe 判别法或凝聚判别法。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s5">第五部分：Raabe 判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Raabe 判别法 (Critère de Raabe-Duhamel)</div>
+    <p>设 $a_n > 0$，$\displaystyle R = \lim_{n \to \infty} n\left(\frac{a_n}{a_{n+1}} - 1\right)$。</p>
+    <ul>
+        <li>$R > 1$：$\sum a_n$ <strong>收敛</strong>。</li>
+        <li>$R < 1$：$\sum a_n$ <strong>发散</strong>。</li>
+        <li>$R = 1$：无法判断。</li>
+    </ul>
+    <p><strong>使用时机：</strong> d'Alembert 比值法给出 $l = 1$ 时的后续武器。</p>
+</div>
+
+<details>
+    <summary>Raabe 判别法的证明思路</summary>
+    <div class="proof">
+        <div class="proof-title">证明思路（$R > 1$）：</div>
+        <p>取 $\alpha$ 使 $1 < \alpha < R$。当 $n$ 充分大时 $n(a_n/a_{n+1} - 1) \ge \alpha$，即：</p>
+        $$\frac{a_{n+1}}{a_n} \le \frac{n}{n + \alpha} = \frac{1}{1 + \alpha/n}$$
+        <p>与 $b_n = 1/n^\alpha$ 比较：$b_{n+1}/b_n = (n/(n+1))^\alpha$。可以证明 $a_{n+1}/a_n \le b_{n+1}/b_n$（$n$ 充分大时），由此 $a_n \le C \cdot b_n = C/n^\alpha$。$\alpha > 1$ 故 $\sum b_n$ 收敛，由比较判别法 $\sum a_n$ 收敛。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">例 — Raabe 判别法实战</div>
+    <p>判断 $\sum_{n=1}^{\infty} \frac{(2n)!}{4^n (n!)^2}$ 的敛散性。</p>
+    <p>比值：$\frac{a_{n+1}}{a_n} = \frac{(2n+2)!}{4^{n+1}((n+1)!)^2} \cdot \frac{4^n (n!)^2}{(2n)!} = \frac{(2n+1)(2n+2)}{4(n+1)^2} = \frac{2n+1}{2(n+1)} \to 1$。</p>
+    <p>d'Alembert 失效！用 Raabe：</p>
+    $$n\left(\frac{a_n}{a_{n+1}} - 1\right) = n\left(\frac{2(n+1)}{2n+1} - 1\right) = n \cdot \frac{1}{2n+1} = \frac{n}{2n+1} \to \frac{1}{2} < 1$$
+    <p>Raabe 判定<strong>发散</strong>。（这就是中心二项式系数 $\binom{2n}{n}/4^n \sim 1/\sqrt{\pi n}$，是 $p = 1/2$ 级的。）</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s6">第六部分：Cauchy 凝聚判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Cauchy 凝聚判别法 (Critère de condensation)</div>
+    <p>设 $(a_n)$ 单调递减且 $a_n \ge 0$。则：</p>
+    $$\sum_{n=1}^{\infty} a_n \text{ 收敛} \iff \sum_{k=0}^{\infty} 2^k a_{2^k} \text{ 收敛}$$
+</div>
+
+<details>
+    <summary>证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>将 $\sum a_n$ 按 $2$ 的幂次分组：第 $k$ 组包含 $a_{2^k}, a_{2^k+1}, \ldots, a_{2^{k+1}-1}$，共 $2^k$ 项。</p>
+        <p>因 $a_n$ 递减：</p>
+        $$2^k a_{2^{k+1}} \le \sum_{n=2^k}^{2^{k+1}-1} a_n \le 2^k a_{2^k}$$
+        <p>对 $k$ 求和：</p>
+        $$\frac{1}{2}\sum_{k=0}^{K} 2^k a_{2^k} \le \sum_{n=1}^{2^{K+1}-1} a_n \le \sum_{k=0}^{K} 2^k a_{2^k}$$
+        <p>两侧同敛散，命题得证。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">应用 — 一行证明 Bertrand 级数</div>
+    <p>$\sum 1/(n(\ln n)^q)$：凝聚后 $2^k a_{2^k} = 2^k / (2^k (k\ln 2)^q) = C/k^q$。</p>
+    <p>这是 $p$-级数！$q > 1$ 收敛，$q \le 1$ 发散。一步到位。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s7">第七部分：交错级数与 Leibniz 准则</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Leibniz 交错级数准则</div>
+    <p>对 $\sum_{n=1}^{\infty} (-1)^n u_n$（$u_n > 0$），若满足：</p>
+    <ol>
+        <li>$(u_n)$ <strong>单调递减</strong>：$u_{n+1} \le u_n$。</li>
+        <li>$\lim_{n \to \infty} u_n = 0$。</li>
+    </ol>
+    <p>则级数<strong>收敛</strong>。且余项估计：$|R_N| = |\sum_{n=N+1}^{\infty} (-1)^n u_n| \le u_{N+1}$。</p>
+</div>
+
+<details>
+    <summary>Leibniz 准则的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>考察偶数部分和 $S_{2N}$：</p>
+        $$S_{2N} = (u_1 - u_2) + (u_3 - u_4) + \cdots + (u_{2N-1} - u_{2N})$$
+        <p>每个括号 $\ge 0$（因 $u_n$ 递减），故 $S_{2N}$ 单调递增。</p>
+        <p>另一方面：</p>
+        $$S_{2N} = u_1 - (u_2 - u_3) - (u_4 - u_5) - \cdots - u_{2N} \le u_1$$
+        <p>单调递增且有上界 $\implies$ $S_{2N} \to S$（某有限值）。</p>
+        <p>$S_{2N+1} = S_{2N} + u_{2N+1} \to S + 0 = S$。</p>
+        <p>所以 $S_N \to S$，级数收敛。</p>
+        <p><strong>余项估计：</strong> $R_N$ 本身也是满足 Leibniz 条件的交错级数，其绝对值 $\le$ 首项 $u_{N+1}$。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ Leibniz 只能证收敛，不能证绝对收敛</div>
+    <p>如果 $\sum |a_n| = \sum u_n$ 也收敛，那是<strong>绝对收敛</strong>（更强）。Leibniz 通常用于证明<strong>条件收敛</strong>。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s8">第八部分：Abel/Dirichlet 判别法（级数版）</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Abel 变换（分部求和 / Sommation d'Abel）</div>
+    <p>设 $B_n = \sum_{k=1}^{n} b_k$（部分和）。则：</p>
+    $$\sum_{k=1}^{N} a_k b_k = a_N B_N + \sum_{k=1}^{N-1}(a_k - a_{k+1}) B_k$$
+    <p>这是分部积分在离散情形下的对应物，是 Dirichlet/Abel 判别法的核心引理。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Dirichlet 判别法（级数版）</div>
+    <p>若：(1) $(B_n)$ 有界；(2) $(a_n)$ 单调趋于 0。则 $\sum a_n b_n$ 收敛。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Abel 判别法（级数版）</div>
+    <p>若：(1) $\sum b_n$ 收敛；(2) $(a_n)$ 单调有界。则 $\sum a_n b_n$ 收敛。</p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">应用 — Leibniz 是 Dirichlet 的特例</div>
+    <p>交错级数 $\sum (-1)^n u_n$：取 $b_n = (-1)^n$，$a_n = u_n$。$B_n$ 在 $0$ 和 $1$ 之间交替，有界；$u_n$ 单调趋于 0。满足 Dirichlet 条件。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s9">第九部分：绝对收敛与条件收敛</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-def">
+    <div class="box-label">定义</div>
+    <ul>
+        <li><strong>绝对收敛：</strong> $\sum |a_n|$ 收敛。</li>
+        <li><strong>条件收敛：</strong> $\sum a_n$ 收敛但 $\sum |a_n|$ 发散。</li>
+    </ul>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 绝对收敛 $\implies$ 收敛</div>
+    <p>证明同积分情形：三角不等式 + 柯西准则。</p>
+</div>
+
+<div class="box box-beyond">
+    <div class="box-label">Riemann 重排定理（超纲但极其深刻）</div>
+    <p>若 $\sum a_n$ <strong>条件收敛</strong>，则对任意 $S \in \mathbb{R} \cup \{\pm\infty\}$，都存在 $\mathbb{N}$ 的一个排列 $\sigma$ 使得 $\sum a_{\sigma(n)} = S$。</p>
+    <p>换言之，条件收敛级数的和<strong>取决于求和顺序</strong>！只有绝对收敛级数才能任意重排不改变和。这是级数理论中最震撼的结果之一。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s10">第十部分：经典反例与致命陷阱</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 1 — 交错项不等于收敛</div>
+    <p>$\sum (-1)^n \frac{n}{n+1}$：通项 $|a_n| = n/(n+1) \to 1 \neq 0$。必要条件不满足，直接发散！别看到 $(-1)^n$ 就条件反射说收敛。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 2 — 等价无穷小用于级数的限制</div>
+    <p>$\sin(1/n) \sim 1/n$，所以 $\sum \sin(1/n)$ 与 $\sum 1/n$ 同敛散——发散。✓</p>
+    <p>但 $\sum (-1)^n \sin(1/n)$：不能用等价无穷小代替后说 $\sum (-1)^n/n$ 收敛所以原级数也收敛。正确做法：验证 $\sin(1/n)$ 单调递减趋于 0，Leibniz 适用，收敛。✓</p>
+    <p><strong>规则：</strong> 等价无穷小只能用于<strong>正项级数</strong>的比较。变号级数中不能直接替换通项。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 3 — 比值法不适用于 $p$-级数</div>
+    <p>$\sum 1/n^p$：$a_{n+1}/a_n = (n/(n+1))^p \to 1$。比值法失效。必须用比较判别法或积分判别法。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 4 — 部分和有界不等于收敛</div>
+    <p>$a_n = (-1)^n$：部分和 $S_N$ 在 $-1$ 和 $0$ 之间交替，有界。但 $a_n \not\to 0$，级数发散。有界 $\neq$ 收敛！</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s11">第十一部分：高阶拓展（超纲）</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<h3>1. Euler-Mascheroni 常数 $\gamma$</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定义与存在性</div>
+    $$\gamma = \lim_{N \to \infty} \left(\sum_{n=1}^{N} \frac{1}{n} - \ln N\right) \approx 0.5772$$
+    <p>虽然调和级数 $\sum 1/n$ 发散，但它与 $\ln N$ 之间的<strong>差</strong>收敛到一个有限常数。</p>
+</div>
+
+<details>
+    <summary>$\gamma$ 存在性的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>设 $\gamma_N = \sum_{n=1}^{N} 1/n - \ln N$。</p>
+        <p><strong>单调性：</strong> $\gamma_N - \gamma_{N+1} = -\frac{1}{N+1} + \ln(N+1) - \ln N = \ln\left(1 + \frac{1}{N}\right) - \frac{1}{N+1}$。</p>
+        <p>由不等式 $\ln(1+x) \ge x/(1+x)$（$x > 0$），取 $x = 1/N$：$\ln(1+1/N) \ge 1/(N+1)$。故 $\gamma_N \ge \gamma_{N+1}$，单调递减。</p>
+        <p><strong>有下界：</strong> 积分判别法的估计给出 $\sum_{n=1}^{N} 1/n \ge \int_1^{N+1} dx/x = \ln(N+1)$，但更精确的分析给出 $\gamma_N \ge 0$。</p>
+        <p>单调递减有下界 $\implies$ 极限存在。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">$\gamma$ 的应用</div>
+    <p>调和级数的精确渐近：$H_N = \sum_{n=1}^N 1/n = \ln N + \gamma + O(1/N)$。</p>
+    <p>在概率论（Gumbel 分布）、数论（素数定理相关常数）中反复出现。</p>
+</div>
+
+<h3>2. Stirling 公式</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">$n! \sim \sqrt{2\pi n} \left(\frac{n}{e}\right)^n$</div>
+    <p>精确含义：$\lim_{n \to \infty} \frac{n!}{\sqrt{2\pi n}(n/e)^n} = 1$。</p>
+    <p><strong>实战价值：</strong> 遇到含 $n!$ 的级数但比值法 $l = 1$ 时，用 Stirling 估计通项的渐近量级，再用比较判别法。</p>
+    <p><strong>例：</strong> $\frac{(2n)!}{4^n (n!)^2} \sim \frac{\sqrt{4\pi n}(2n/e)^{2n}}{4^n \cdot 2\pi n \cdot (n/e)^{2n}} = \frac{1}{\sqrt{\pi n}}$。这是 $1/n^{1/2}$ 级，发散。</p>
+</div>
+
+<h3>3. Riemann $\zeta$ 函数初步</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定义与特殊值</div>
+    $$\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s} \qquad (s > 1 \text{ 时收敛})$$
+    <p>特殊值（部分可用 Fourier 级数证明）：</p>
+    <ul>
+        <li>$\zeta(2) = \pi^2/6$（Basel 问题，Euler 1735）</li>
+        <li>$\zeta(4) = \pi^4/90$</li>
+        <li>$\zeta(2k) = (-1)^{k+1} \frac{(2\pi)^{2k} B_{2k}}{2(2k)!}$（$B_{2k}$ 是 Bernoulli 数）</li>
+    </ul>
+    <p>$\zeta(3) \approx 1.202$（Apéry 常数，已证无理性，但无闭合表达式）。$\zeta$ 函数在数论中具有核心地位（Riemann 猜想、素数分布）。</p>
+</div>
+
+<h3>4. 级数求和技巧速查</h3>
+
+<div class="box box-tech">
+    <div class="box-label">常用求和工具</div>
+    <ul>
+        <li><strong>望远镜级数（télescopage）：</strong> $\sum (b_n - b_{n+1}) = b_1 - \lim b_n$。</li>
+        <li><strong>部分分式分解：</strong> $\frac{1}{n(n+1)} = \frac{1}{n} - \frac{1}{n+1}$，化为望远镜。</li>
+        <li><strong>泰勒展开生成：</strong> $\sum x^n/n! = e^x - 1$，$\sum (-1)^n x^{2n}/(2n)! = \cos x - 1$。</li>
+        <li><strong>Abel 求和 + 逐项求导/积分：</strong> 对幂级数 $\sum a_n x^n$ 操作后取 $x = 1$。如 $\sum 1/n^2$ 可由 $-\ln(1-x)/x$ 的积分推导。</li>
+    </ul>
+</div>
+
+<hr style="border: none; border-top: 2px solid var(--border); margin: 50px 0;">
+
+<div style="text-align: center; color: var(--text-dim); font-size: 0.9em; padding: 20px 0;">
+    <a href="./series_exercises.html" style="color: var(--blue); text-decoration: none; font-weight: 700; font-size: 1.1em;">进入数项级数特训 →</a>
+    <br><br>
+    <a href="./index.html" style="color: var(--text-dim); text-decoration: none;">← 返回主页</a>
+</div>
+
+<!-- Floating bookmark nav -->
+<div id="bm-fab" onclick="toggleBM()" style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;background:#2563eb;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,0.4);z-index:999;transition:all .2s;color:#fff;font-size:22px;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">
+    <span id="bm-icon">☰</span>
+</div>
+<div id="bm-panel" style="display:none;position:fixed;bottom:88px;right:24px;width:280px;max-height:60vh;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.15);z-index:998;overflow-y:auto;border:1px solid #e2e8f0;">
+    <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-weight:700;font-size:0.95em;color:#1e293b;display:flex;justify-content:space-between;align-items:center;">
+        <span>📑 快速导航</span>
+        <span onclick="toggleBM()" style="cursor:pointer;color:#94a3b8;font-size:18px;">✕</span>
+    </div>
+    <div id="bm-links" style="padding:8px 12px;"></div>
+</div>
+<style>
+#bm-panel { animation: bmSlide .25s ease-out; }
+@keyframes bmSlide { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+#bm-panel a { display:block; padding:10px 12px; color:#334155; text-decoration:none; font-size:0.88em; border-radius:8px; transition:all .15s; line-height:1.4; }
+#bm-panel a:hover { background:#eff6ff; color:#2563eb; }
+#bm-panel a.active { background:#eff6ff; color:#2563eb; font-weight:600; }
+</style>
+<script>
+let bmOpen = false;
+function toggleBM() {
+    bmOpen = !bmOpen;
+    document.getElementById('bm-panel').style.display = bmOpen ? 'block' : 'none';
+    document.getElementById('bm-icon').textContent = bmOpen ? '✕' : '☰';
+}
+(function() {
+    const c = document.getElementById('bm-links');
+    document.querySelectorAll('h2[id]').forEach(h => {
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent.replace(/[▸▾]/g, '').trim();
+        a.onclick = () => setTimeout(() => toggleBM(), 150);
+        c.appendChild(a);
+    });
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            const link = c.querySelector('a[href="#' + e.target.id + '"]');
+            if (link) link.classList.toggle('active', e.isIntersecting);
+        });
+    }, { rootMargin: '-10% 0px -75% 0px' });
+    document.querySelectorAll('h2[id]').forEach(h => obs.observe(h));
+})();
+</script>
+
+</body>
+</html>

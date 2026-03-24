@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学分析学习与特训平台</title>
+    <style>
+        :root {
+            --primary: #3b82f6; --primary-dark: #2563eb;
+            --emerald: #10b981; --emerald-dark: #059669;
+            --slate-800: #1e293b; --slate-500: #64748b; --slate-100: #f1f5f9;
+            --bg: #f8fafc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--slate-800); line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 2.5em; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .subtitle { color: var(--slate-500); font-size: 1.1em; }
+        
+        .section-title { font-size: 1.4em; font-weight: bold; border-bottom: 3px solid var(--slate-100); padding-bottom: 10px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;}
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 50px; }
+        
+        .card { background: #fff; border-radius: 12px; padding: 25px; text-decoration: none; color: inherit; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.2s ease; position: relative; overflow: hidden;}
+        .card:hover:not(.disabled) { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        
+        .card.theory::before { background: var(--emerald); }
+        .card.exercise::before { background: var(--primary); }
+        .card.disabled { opacity: 0.6; cursor: default; background: #f8fafc; }
+        .card.disabled::before { background: #cbd5e1; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 1.2em; font-weight: 700; }
+        .tag { font-size: 0.75em; padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+        .tag.theory { background: #ecfdf5; color: var(--emerald-dark); }
+        .tag.exercise { background: #eff6ff; color: var(--primary-dark); }
+        .tag.disabled { background: #e2e8f0; color: var(--slate-500); }
+        
+        .card-desc { color: var(--slate-500); font-size: 0.9em; flex-grow: 1; }
+        .card-footer { margin-top: 20px; font-size: 0.9em; font-weight: 700; text-align: right; }
+        .card.theory .card-footer { color: var(--emerald); }
+        .card.exercise .card-footer { color: var(--primary); }
+        .card.disabled .card-footer { color: var(--slate-500); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>数学分析精练平台</h1>
+            <p class="subtitle">考点拆解 · 严密证明 · 极限特训</p>
+        </header>
+
+        <!-- 第一章：反常积分 -->
+        <div class="section-title">
+            <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 6px; font-size: 0.8em;">模块一</span> 反常积分 (Intégrales Impropres)
+        </div>
+        <div class="grid">
+            <a href="./integral_methods.html" class="card theory">
+                <div class="card-header">
+                    <div class="card-title">知识与方法论</div>
+                    <span class="tag theory">知识讲解</span>
+                </div>
+                <div class="card-desc">涵盖 p-积分、伯特兰积分标尺，以及狄利克雷/阿贝尔判别法的分部积分严密证明。</div>
+                <div class="card-footer">查阅指南 &rarr;</div>
+            </a>
+            <a href="./integral_exercises.html" class="card exercise">
+                <div class="card-header">
+                    <div class="card-title">反常积分特训库</div>
+                    <span class="tag exercise">刷题实战</span>
+                </div>
+                <div class="card-desc">包含极易混淆的瑕点判断、条件收敛陷阱以及法国 TD 压轴级别的经典反例。</div>
+                <div class="card-footer">进入特训 &rarr;</div>
+            </a>
+        </div>
+
+        <!-- 第二章：数项级数 -->
+        <div class="section-title">
+            <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 6px; font-size: 0.8em;">模块二</span> 数项级数 (Séries Numériques)
+        </div>
+        <div class="grid">
+            <a href="./series_methods.html" class="card theory">
+                <div class="card-header">
+                    <div class="card-title">知识与方法论</div>
+                    <span class="tag theory">知识讲解</span>
+                </div>
+                <div class="card-desc">正项级数的比值/根值判别法，交错级数的莱布尼茨准则及等价无穷小泰勒展开技巧。</div>
+                <div class="card-footer">查阅指南 &rarr;</div>
+            </a>
+            <a href="./series_exercises.html" class="card exercise">
+                <div class="card-header">
+                    <div class="card-title">数项级数特训库</div>
+                    <span class="tag exercise">刷题实战</span>
+                </div>
+                <div class="card-desc">通项极限测试、达朗贝尔失效区处理及各类条件收敛的精确判定特训。</div>
+                <div class="card-footer">进入特训 &rarr;</div>
+            </a>
+        </div>
+
+        <!-- 第三章：拓展 -->
+        <div class="section-title">
+            <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 6px; font-size: 0.8em;">拓展</span> 高阶微积分
+        </div>
+        <div class="grid">
+            <div class="card disabled">
+                <div class="card-header">
+                    <div class="card-title">多变量微积分</div>
+                    <span class="tag disabled">开发中</span>
+                </div>
+                <div class="card-desc">多重积分、格林公式、高斯公式及斯托克斯定理的应用与物理直觉。</div>
+                <div class="card-footer">敬请期待 ⏳</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

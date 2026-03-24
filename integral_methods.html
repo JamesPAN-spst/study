@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反常积分：完全指南</title>
+    <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], tags: 'ams' },
+      chtml: { matchFontHeight: true, mtextInheritFont: true }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc; --surface: #fff; --text: #1e293b; --text-dim: #64748b;
+            --blue: #2563eb; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+            --green: #059669; --green-bg: #ecfdf5; --green-border: #a7f3d0;
+            --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+            --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+            --red: #dc2626; --red-bg: #fef2f2; --red-border: #fecaca;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif;
+            line-height: 1.8; color: var(--text); background: var(--bg);
+            max-width: 920px; margin: 0 auto; padding: 40px 24px 80px;
+            font-size: 16px;
+        }
+        
+        /* ── Header ── */
+        h1 {
+            text-align: center; font-size: 2em; font-weight: 700; color: var(--text);
+            border-bottom: 3px solid var(--blue); padding-bottom: 16px; margin-bottom: 12px;
+        }
+        .page-subtitle { text-align: center; color: var(--text-dim); margin-bottom: 50px; font-size: 0.95em; }
+        h2 {
+            color: var(--blue); margin-top: 56px; font-size: 1.35em; font-weight: 700;
+            border-left: 5px solid var(--blue); padding: 10px 16px;
+            background: var(--blue-bg); border-radius: 0 8px 8px 0;
+        }
+        h3 { color: var(--green); margin-top: 32px; font-size: 1.15em; font-weight: 700; }
+        h4 { color: var(--purple); margin-top: 24px; font-size: 1.05em; font-weight: 700; }
+        p { margin: 10px 0; }
+        
+        /* ── Content Boxes ── */
+        .box {
+            background: var(--surface); padding: 20px 24px; margin: 20px 0;
+            border-radius: 0 10px 10px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .box-def { border-left: 5px solid var(--blue); }
+        .box-thm { border-left: 5px solid var(--green); }
+        .box-tech { border-left: 5px solid var(--purple); }
+        .box-warn { border-left: 5px solid var(--amber); background: var(--amber-bg); }
+        .box-danger { border-left: 5px solid var(--red); background: var(--red-bg); }
+        .box-beyond { border-left: 5px solid #0891b2; background: #ecfeff; }
+        
+        .box-label {
+            font-weight: 700; margin-bottom: 10px; font-size: 1.05em;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .box-def .box-label { color: var(--blue); }
+        .box-thm .box-label { color: var(--green); }
+        .box-tech .box-label { color: var(--purple); }
+        .box-warn .box-label { color: var(--amber); }
+        .box-danger .box-label { color: var(--red); }
+        .box-beyond .box-label { color: #0891b2; }
+        
+        /* ── Proof blocks ── */
+        .proof {
+            background: #fafbfc; border: 1px dashed var(--border); padding: 20px 24px;
+            margin: 16px 0; border-radius: 8px; font-size: 0.95em;
+        }
+        .proof-title { font-weight: 700; color: var(--text-dim); margin-bottom: 10px; font-style: italic; }
+        .proof .qed { text-align: right; font-weight: 700; }
+        
+        /* ── Collapsible ── */
+        details { margin: 12px 0; }
+        details summary {
+            cursor: pointer; padding: 12px 16px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 8px;
+            font-weight: 600; font-size: 0.95em; color: var(--text);
+            transition: all 0.2s; list-style: none;
+        }
+        details summary::-webkit-details-marker { display: none; }
+        details summary::before { content: "▸ "; color: var(--blue); font-weight: 700; }
+        details[open] summary::before { content: "▾ "; }
+        details[open] summary { border-radius: 8px 8px 0 0; border-bottom-color: transparent; background: var(--blue-bg); }
+        details .proof { border-top: none; border-radius: 0 0 8px 8px; margin-top: 0; }
+        
+        /* ── Lists & Tables ── */
+        ul, ol { padding-left: 24px; margin: 8px 0; }
+        li { margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92em; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: center; }
+        th { background: var(--blue-bg); font-weight: 700; color: var(--blue); }
+        
+        /* ── Navigation ── */
+        .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 40px; }
+        .toc-title { font-weight: 700; font-size: 1.1em; margin-bottom: 12px; color: var(--text); }
+        .toc a { color: var(--blue); text-decoration: none; font-size: 0.93em; }
+        .toc a:hover { text-decoration: underline; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 4px; }
+        
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--blue); text-decoration: none; font-weight: 600; font-size: 0.9em; }
+        .back-link:hover { text-decoration: underline; }
+        
+        /* ── MathJax tweaks ── */
+        mjx-container { font-size: 105% !important; }
+        mjx-container[display="true"] { margin: 16px 0 !important; }
+        
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            body { padding: 20px 14px 60px; font-size: 15px; }
+            h1 { font-size: 1.6em; }
+            .box, .proof { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="./index.html" class="back-link">← 返回主页</a>
+
+<h1>反常积分：完全指南</h1>
+<p class="page-subtitle">Intégrales Impropres — 参考标尺 · 判别法严密证明 · 解题技巧 · 高阶拓展</p>
+
+<div class="toc">
+    <div class="toc-title">目录</div>
+    <ol>
+        <li><a href="#s1">定义与柯西收敛准则</a></li>
+        <li><a href="#s2">参考标尺：Riemann 积分与 Bertrand 积分</a></li>
+        <li><a href="#s3">比较判别法（直接形式与极限形式）</a></li>
+        <li><a href="#s4">绝对收敛与条件收敛</a></li>
+        <li><a href="#s5">Dirichlet 判别法与 Abel 判别法</a></li>
+        <li><a href="#s6">积分第二中值定理（分部积分核心引理）</a></li>
+        <li><a href="#s7">经典反例与致命陷阱</a></li>
+        <li><a href="#s8">混合型积分与含参讨论</a></li>
+        <li><a href="#s9">高阶拓展：Gamma 函数、Beta 函数与 Frullani 积分</a></li>
+    </ol>
+</div>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 核心心法</div>
+    <p>反常积分的本质是<strong>「比快慢」</strong>。正项积分看衰减速度——衰减够快就收敛；振荡积分看「抵消」能否压住「衰减不足」。掌握本页的<strong>参考标尺</strong>和<strong>判别法</strong>，即可解决绝大多数敛散性问题。</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s1">第一部分：定义与柯西收敛准则</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-def">
+    <div class="box-label">定义 — 两类反常积分</div>
+    <p><strong>无穷积分</strong>（积分上限趋于 $\infty$）：</p>
+    $$\int_a^{+\infty} f(t)\,dt = \lim_{A \to +\infty} \int_a^A f(t)\,dt$$
+    <p><strong>瑕积分</strong>（被积函数在端点处无界，瑕点为 $a$）：</p>
+    $$\int_a^b f(t)\,dt = \lim_{\varepsilon \to 0^+} \int_{a+\varepsilon}^b f(t)\,dt$$
+    <p>两类本质相同：都是对<strong>极限过程</strong>的考察。如果极限存在且有限，称积分<strong>收敛</strong>；否则<strong>发散</strong>。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 柯西收敛准则 (Critère de Cauchy)</div>
+    <p>$\displaystyle\int_a^{+\infty} f(t)\,dt$ 收敛的充要条件是：</p>
+    $$\forall \varepsilon > 0,\ \exists M > a,\ \forall A, B \ge M: \left|\int_A^B f(t)\,dt\right| < \varepsilon$$
+    <p>直觉：积分的「尾部贡献」可以任意小。</p>
+</div>
+
+<details>
+    <summary>柯西准则的严密证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>设 $F(A) = \int_a^A f(t)\,dt$。则 $\int_a^{+\infty} f(t)\,dt$ 收敛 $\iff$ $\lim_{A \to +\infty} F(A)$ 存在。</p>
+        <p>由实数列的柯西准则，$\lim_{A \to +\infty} F(A)$ 存在 $\iff$</p>
+        $$\forall \varepsilon > 0,\ \exists M > a,\ \forall A, B \ge M: |F(B) - F(A)| < \varepsilon$$
+        <p>而 $F(B) - F(A) = \int_A^B f(t)\,dt$，命题即得。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">柯西准则的逆否命题（证伪利器）</div>
+    <p>若能找到某个常数 $\delta > 0$ 以及两列 $A_n, B_n \to +\infty$，使得</p>
+    $$\left|\int_{A_n}^{B_n} f(t)\,dt\right| \ge \delta \quad \text{对无穷多个 } n \text{ 成立}$$
+    <p>则积分发散。这是证明发散最锋利的武器之一。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s2">第二部分：参考标尺</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<h3>1. Riemann 积分（$p$-积分）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — $p$-积分标尺</div>
+    <table>
+        <tr><th>积分类型</th><th>收敛条件</th><th>发散条件</th><th>临界 $p=1$</th></tr>
+        <tr><td>$\displaystyle\int_1^{+\infty} \frac{dt}{t^p}$（无穷端）</td><td>$p > 1$</td><td>$p \le 1$</td><td>$\ln t \to +\infty$，发散</td></tr>
+        <tr><td>$\displaystyle\int_0^1 \frac{dt}{t^p}$（瑕点端）</td><td>$p < 1$</td><td>$p \ge 1$</td><td>$-\ln t \to +\infty$，发散</td></tr>
+    </table>
+    <p><strong>记忆口诀：「远严近宽」</strong>——无穷端要 $p > 1$（衰减够快），瑕点端要 $p < 1$（发散够慢）。</p>
+</div>
+
+<details>
+    <summary>$p$-积分的完整证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明（无穷积分 $\int_1^{+\infty} t^{-p}\,dt$）：</div>
+        <p><strong>情形 $p \neq 1$：</strong></p>
+        $$\int_1^A t^{-p}\,dt = \left[\frac{t^{1-p}}{1-p}\right]_1^A = \frac{A^{1-p} - 1}{1-p}$$
+        <ul>
+            <li>若 $p > 1$：$1 - p < 0$，故 $A^{1-p} \to 0$。极限 $= \frac{1}{p-1}$，收敛。</li>
+            <li>若 $p < 1$：$1 - p > 0$，故 $A^{1-p} \to +\infty$，发散。</li>
+        </ul>
+        <p><strong>情形 $p = 1$：</strong></p>
+        $$\int_1^A \frac{dt}{t} = \ln A \to +\infty \quad \text{发散}$$
+        <p><strong>瑕积分 $\int_0^1 t^{-p}\,dt$ 类似</strong>：当 $p \neq 1$ 时，$\int_\varepsilon^1 t^{-p}\,dt = \frac{1 - \varepsilon^{1-p}}{1-p}$。</p>
+        <ul>
+            <li>若 $p < 1$：$1 - p > 0$，$\varepsilon^{1-p} \to 0$，极限 $= \frac{1}{1-p}$，收敛。</li>
+            <li>若 $p > 1$：$1 - p < 0$，$\varepsilon^{1-p} \to +\infty$，发散。</li>
+        </ul>
+        <p>$p = 1$ 时 $\int_\varepsilon^1 dt/t = -\ln\varepsilon \to +\infty$，发散。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<h3>2. Bertrand 积分（对数精细标尺）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Bertrand 积分</div>
+    <p>$$\int_e^{+\infty} \frac{dt}{t^p (\ln t)^q}$$</p>
+    <p>收敛条件（严格按优先级）：</p>
+    <ol>
+        <li>$p > 1$：<strong>收敛</strong>（$q$ 任意）。多项式衰减的压制力绝对优先。</li>
+        <li>$p = 1$ 且 $q > 1$：<strong>收敛</strong>。多项式打平后，对数的幂次决定胜负。</li>
+        <li>$p = 1$ 且 $q \le 1$：<strong>发散</strong>。</li>
+        <li>$p < 1$：<strong>发散</strong>（$q$ 任意）。</li>
+    </ol>
+</div>
+
+<details>
+    <summary>Bertrand 积分的严密证明（关键情形 $p=1$）</summary>
+    <div class="proof">
+        <div class="proof-title">证明（$p = 1$ 的情形）：</div>
+        <p>此时积分为 $\int_e^{+\infty} \frac{dt}{t(\ln t)^q}$。令 $u = \ln t$，$du = dt/t$：</p>
+        $$\int_e^A \frac{dt}{t(\ln t)^q} = \int_1^{\ln A} \frac{du}{u^q}$$
+        <p>这恰好是 $u$ 上的 $p$-积分！</p>
+        <ul>
+            <li>$q > 1$：$\int_1^{+\infty} u^{-q}\,du = \frac{1}{q-1}$，收敛。</li>
+            <li>$q = 1$：$\int_1^{\ln A} du/u = \ln(\ln A) \to +\infty$，发散。</li>
+            <li>$q < 1$：$\int_1^{+\infty} u^{-q}\,du$ 发散（$q < 1$ 在 $p$-积分意义下发散）。</li>
+        </ul>
+        <p><strong>$p > 1$ 的情形：</strong> 取 $\alpha$ 使 $1 < \alpha < p$，则当 $t$ 充分大时 $(\ln t)^q \le t^{p - \alpha}$（对数增长不敌任何多项式），因此</p>
+        $$\frac{1}{t^p (\ln t)^q} \le \frac{1}{t^\alpha}$$
+        <p>而 $\alpha > 1$，由比较判别法收敛。</p>
+        <p><strong>$p < 1$ 的情形：</strong> 取 $\beta$ 使 $p < \beta < 1$，类似地 $\frac{1}{t^p(\ln t)^q} \ge \frac{1}{t^\beta}$，由比较判别法发散。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 瑕点端的 Bertrand 积分</div>
+    <p>同样有对应版本：$\displaystyle\int_0^{1/e} \frac{dt}{t^p |\ln t|^q}$，结论<strong>方向相反</strong>（类比 $p$-积分的方向反转）：</p>
+    <ul>
+        <li>$p < 1$：收敛。</li>
+        <li>$p = 1$ 且 $q > 1$：收敛。</li>
+        <li>其余：发散。</li>
+    </ul>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s3">第三部分：比较判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<h3>1. 直接比较（放缩法）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 直接比较判别法</div>
+    <p>设 $0 \le f(x) \le g(x)$（在 $[a, +\infty)$ 上最终成立），则：</p>
+    <ul>
+        <li>$\int g$ 收敛 $\implies$ $\int f$ 收敛（大的收敛，小的必收敛）。</li>
+        <li>$\int f$ 发散 $\implies$ $\int g$ 发散（小的发散，大的必发散）。</li>
+    </ul>
+</div>
+
+<details>
+    <summary>直接比较判别法的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>设 $F(A) = \int_a^A f$，$G(A) = \int_a^A g$。由 $f \le g \ge 0$：</p>
+        <ul>
+            <li>$F(A)$ 关于 $A$ 单调递增。</li>
+            <li>$F(A) \le G(A)$ 对一切 $A$ 成立。</li>
+        </ul>
+        <p>若 $\int g$ 收敛，即 $G(A) \to L < +\infty$，则 $F(A) \le L$。单调递增且有上界 $\implies$ 极限存在，即 $\int f$ 收敛。逆否命题给出另一半。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<h3>2. 极限比较（等价无穷小）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 极限比较判别法</div>
+    <p>设 $f, g > 0$，$\displaystyle L = \lim_{x \to +\infty} \frac{f(x)}{g(x)}$。</p>
+    <table>
+        <tr><th>极限值</th><th>结论</th></tr>
+        <tr><td>$0 < L < +\infty$</td><td>$\int f$ 与 $\int g$ <strong>同敛散</strong></td></tr>
+        <tr><td>$L = 0$</td><td>$\int g$ 收敛 $\Rightarrow$ $\int f$ 收敛（单向！）</td></tr>
+        <tr><td>$L = +\infty$</td><td>$\int g$ 发散 $\Rightarrow$ $\int f$ 发散（单向！）</td></tr>
+    </table>
+</div>
+
+<details>
+    <summary>极限比较判别法的证明（$0 < L < +\infty$ 情形）</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>取 $\varepsilon = L/2 > 0$，则存在 $M$ 使得 $x \ge M$ 时：</p>
+        $$\frac{L}{2} \le \frac{f(x)}{g(x)} \le \frac{3L}{2}$$
+        <p>即 $\frac{L}{2}\, g(x) \le f(x) \le \frac{3L}{2}\, g(x)$。由直接比较判别法：</p>
+        <ul>
+            <li>$\int g$ 收敛 $\implies$ $\int \frac{3L}{2}g$ 收敛 $\implies$ $\int f$ 收敛。</li>
+            <li>$\int g$ 发散 $\implies$ $\int \frac{L}{2}g$ 发散 $\implies$ $\int f$ 发散。</li>
+        </ul>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">实战技巧 — 等价无穷小工具箱</div>
+    <p>当 $u \to 0$ 时：</p>
+    $$\sin u \sim u, \quad 1 - \cos u \sim \frac{u^2}{2}, \quad \ln(1+u) \sim u, \quad e^u - 1 \sim u, \quad (1+u)^\alpha - 1 \sim \alpha u$$
+    <p>当 $x \to +\infty$ 时，「抓大头」：分子最高次项 $\div$ 分母最高次项，得到等价的 $p$-积分。</p>
+    <p><strong>关键注意：</strong>等价无穷小只能用于<strong>乘除</strong>，不能直接用于<strong>加减</strong>！</p>
+</div>
+
+<div class="box box-warn">
+    <div class="box-label">⚠ $L = 0$ 或 $L = +\infty$ 时只能单向推导</div>
+    <p><strong>反例：</strong> 设 $f(x) = \frac{1}{x \ln x}$，$g(x) = \frac{1}{x}$，则 $\lim f/g = \lim 1/\ln x = 0$。</p>
+    <p>$\int_2^\infty g$ 发散，但我们<strong>不能</strong>由此断定 $\int_2^\infty f$ 的敛散性。事实上 $\int_2^\infty f$ 也发散（Bertrand 积分 $p=1, q=1$）。</p>
+    <p>但若换 $f(x) = \frac{1}{x(\ln x)^2}$，同样 $L=0$，此时 $\int f$ 收敛。所以 $L=0$ + $\int g$ 发散时什么也推不出。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s4">第四部分：绝对收敛与条件收敛</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-def">
+    <div class="box-label">定义</div>
+    <ul>
+        <li>$\int_a^{+\infty} f(x)\,dx$ <strong>绝对收敛</strong>：$\int_a^{+\infty} |f(x)|\,dx$ 收敛。</li>
+        <li>$\int_a^{+\infty} f(x)\,dx$ <strong>条件收敛</strong>：$\int f$ 收敛但 $\int |f|$ 发散。</li>
+    </ul>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 绝对收敛 $\implies$ 收敛</div>
+    <p>若 $\int_a^{+\infty} |f(x)|\,dx$ 收敛，则 $\int_a^{+\infty} f(x)\,dx$ 也收敛。</p>
+</div>
+
+<details>
+    <summary>证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明（柯西准则法）：</div>
+        <p>由绝对收敛，$\int |f|$ 满足柯西准则：$\forall \varepsilon > 0$，$\exists M$ 使 $A, B \ge M$ 时 $\int_A^B |f(t)|\,dt < \varepsilon$。</p>
+        <p>而 $\left|\int_A^B f(t)\,dt\right| \le \int_A^B |f(t)|\,dt < \varepsilon$。</p>
+        <p>故 $\int f$ 也满足柯西准则，收敛。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">判断绝对收敛的快速手法</div>
+    <p>若被积函数带有符号变化（$\cos$, $\sin$, $(-1)^n$ 等），先<strong>加绝对值放缩</strong>：</p>
+    $$\left|\frac{\cos x}{x^2}\right| \le \frac{1}{x^2} \quad \Longrightarrow \quad \int_1^\infty \frac{\cos x}{x^2}\,dx \text{ 绝对收敛}$$
+    <p>能绝对收敛就绝对收敛，省去所有麻烦。只有绝对值放缩后发散，才需动用 Dirichlet/Abel。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s5">第五部分：Dirichlet 判别法与 Abel 判别法</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 使用场景</div>
+    <p>这两个判别法专治<strong>带振荡因子</strong>的积分（如 $\sin x / x$, $\cos x / \ln x$ 等），即那些绝对值放缩后会发散、但本身可能靠「正负抵消」收敛的情况。</p>
+</div>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Dirichlet 判别法 (Critère de Dirichlet)</div>
+    <p>对 $\int_a^{+\infty} f(x)g(x)\,dx$，若同时满足：</p>
+    <ol>
+        <li>$f$ 的变上限积分<strong>有界</strong>：$\exists M > 0$，$\forall A \ge a$，$\left|\int_a^A f(t)\,dt\right| \le M$。</li>
+        <li>$g$ <strong>单调</strong>且 $\lim_{x \to +\infty} g(x) = 0$。</li>
+    </ol>
+    <p>则 $\int_a^{+\infty} f(x)g(x)\,dx$ <strong>收敛</strong>。</p>
+</div>
+
+<details>
+    <summary>Dirichlet 判别法的严密证明（分部积分法）</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>设 $F(x) = \int_a^x f(t)\,dt$，则 $F'(x) = f(x)$，且 $|F(x)| \le M$。设 $g \in C^1$ 且单调。</p>
+        <p>对 $[a, A]$ 分部积分（第二积分中值定理的精神）：</p>
+        $$\int_a^A f(x)g(x)\,dx = \left[F(x)g(x)\right]_a^A - \int_a^A F(x)g'(x)\,dx = F(A)g(A) - F(a)g(a) - \int_a^A F(x)g'(x)\,dx$$
+        <p>当 $A \to +\infty$ 时需证三项均有极限：</p>
+        <p><strong>边界项：</strong> $|F(A)g(A)| \le M|g(A)| \to 0$（$F$ 有界、$g \to 0$），$F(a)g(a)$ 为常数。✓</p>
+        <p><strong>积分项：</strong>证明 $\int_a^{+\infty} F(x)g'(x)\,dx$ <strong>绝对收敛</strong>。因 $g$ 单调，$g'$ 不变号。设 $g$ 单调递减（$g' \le 0$），则 $|g'(x)| = -g'(x)$：</p>
+        $$\int_a^A |F(x)g'(x)|\,dx \le M \int_a^A |g'(x)|\,dx = M \int_a^A (-g'(x))\,dx = M\big(g(a) - g(A)\big) \to M \cdot g(a) < +\infty$$
+        <p>所以 $\int F(x)g'(x)\,dx$ 绝对收敛，从而收敛。✓</p>
+        <p>三项极限均存在，故 $\int_a^{+\infty} f(x)g(x)\,dx$ 收敛。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-thm">
+    <div class="box-label">定理 — Abel 判别法 (Critère d'Abel)</div>
+    <p>对 $\int_a^{+\infty} f(x)g(x)\,dx$，若同时满足：</p>
+    <ol>
+        <li>$\int_a^{+\infty} f(x)\,dx$ <strong>收敛</strong>。</li>
+        <li>$g$ <strong>单调有界</strong>。</li>
+    </ol>
+    <p>则 $\int_a^{+\infty} f(x)g(x)\,dx$ <strong>收敛</strong>。</p>
+</div>
+
+<details>
+    <summary>Abel 判别法的证明（归结为 Dirichlet）</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        <p>设 $\lim_{x \to +\infty} g(x) = l$（$g$ 单调有界，极限必存在）。令 $h(x) = g(x) - l$，则 $h$ 单调且 $h(x) \to 0$。</p>
+        $$\int_a^{+\infty} f(x)g(x)\,dx = \int_a^{+\infty} f(x)h(x)\,dx + l \int_a^{+\infty} f(x)\,dx$$
+        <p>右侧第二项：$\int f$ 收敛，乘以常数 $l$，收敛。✓</p>
+        <p>右侧第一项：$\int f$ 收敛 $\implies$ $F(x) = \int_a^x f$ 有极限，从而有界；$h$ 单调趋于 $0$。满足 Dirichlet 条件，收敛。✓</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">Dirichlet vs Abel：何时用哪个？</div>
+    <table>
+        <tr><th></th><th>Dirichlet</th><th>Abel</th></tr>
+        <tr><td>对 $f$ 的要求</td><td>原函数<strong>有界</strong>（不要求收敛）</td><td>$\int f$ <strong>收敛</strong></td></tr>
+        <tr><td>对 $g$ 的要求</td><td>单调 $\to 0$</td><td>单调有界（极限不必为 0）</td></tr>
+        <tr><td>典型场景</td><td>$\int \frac{\sin x}{x^p}\,dx$（$0 < p \le 1$）</td><td>已知 $\int f$ 收敛，乘以缓变因子</td></tr>
+    </table>
+</div>
+
+<h4>经典应用</h4>
+
+<div class="box box-tech">
+    <div class="box-label">例 1 — $\int_1^{+\infty} \frac{\sin x}{x}\,dx$ 条件收敛</div>
+    <p><strong>收敛性：</strong> 取 $f(x) = \sin x$，$g(x) = 1/x$。</p>
+    <ul>
+        <li>$\left|\int_1^A \sin x\,dx\right| = |\cos 1 - \cos A| \le 2$：有界。✓</li>
+        <li>$1/x$ 单调递减趋于 0。✓</li>
+    </ul>
+    <p>由 Dirichlet 判别法，积分收敛。</p>
+    <p><strong>非绝对收敛：</strong> $\left|\frac{\sin x}{x}\right| \ge \frac{\sin^2 x}{x} = \frac{1 - \cos 2x}{2x}$。</p>
+    <p>而 $\int \frac{1}{2x}\,dx$ 发散，$\int \frac{\cos 2x}{2x}\,dx$ 收敛（Dirichlet）。故 $\int |\sin x / x|$ 发散。</p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">例 2 — Abel 判别法应用</div>
+    <p>已知 $\int_1^{+\infty} \frac{\sin x}{x}\,dx$ 收敛，判断 $\int_1^{+\infty} \frac{\sin x}{x} e^{1/x}\,dx$。</p>
+    <p>取 $f(x) = \sin x / x$，$g(x) = e^{1/x}$。$g$ 在 $[1, +\infty)$ 上单调递减且有界（$1 \le g(x) \le e$）。</p>
+    <p>由 Abel 判别法，积分收敛。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s6">第六部分：积分第二中值定理</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-thm">
+    <div class="box-label">定理 — 积分第二中值定理 (Second Mean Value Theorem)</div>
+    <p>设 $f$ 在 $[a,b]$ 上可积，$g$ 在 $[a,b]$ 上<strong>单调</strong>，则存在 $\xi \in [a,b]$ 使得：</p>
+    $$\int_a^b f(x)g(x)\,dx = g(a)\int_a^\xi f(x)\,dx + g(b)\int_\xi^b f(x)\,dx$$
+    <p>特别地，若 $g \ge 0$ 且单调递减，则 $\exists \xi$ 使得 $\int_a^b fg = g(a)\int_a^\xi f$。</p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">为何重要？</div>
+    <p>这是 Dirichlet/Abel 证明的核心引理。在不假设 $g \in C^1$ 时（即 $g$ 不可微），分部积分法无法使用，但第二中值定理依然成立——它只需要 $g$ <strong>单调</strong>。这使得判别法的适用范围更广。</p>
+    <p>在 TD 和考试中，如果要求不用分部积分证明 Dirichlet，就需要此定理。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s7">第七部分：经典反例与致命陷阱</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 1 — $\int_1^{+\infty} \frac{\sin^2 x}{x}\,dx$ 发散</div>
+    <p>不要看到「振荡÷$x$」就条件反射说收敛！</p>
+    <p><strong>降幂分拆：</strong></p>
+    $$\frac{\sin^2 x}{x} = \frac{1 - \cos 2x}{2x} = \frac{1}{2x} - \frac{\cos 2x}{2x}$$
+    <p>后项 $\int \frac{\cos 2x}{2x}\,dx$ 由 Dirichlet 收敛；但前项 $\int \frac{1}{2x}\,dx$ 发散。</p>
+    <p>收敛 $-$ 发散 $=$ <strong>发散</strong>。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 2 — $\int_0^{+\infty} \frac{1}{x^2}\,dx$ 发散</div>
+    <p>虽然无穷端 $p=2>1$ 收敛，但<strong>必须截断检查 $x=0$ 处</strong>！瑕点端 $p=2 \ge 1$，发散。两端不可抵消——一端发散则整体发散。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 3 — 收敛积分的乘积可能发散</div>
+    <p>$\int_1^{+\infty} f \cdot g$ 不一定收敛，即使 $\int f$ 和 $\int g$ 都收敛。</p>
+    <p><strong>反例：</strong> $f(x) = g(x) = \frac{\sin x}{\sqrt{x}}$。两者均收敛（Dirichlet），但乘积：</p>
+    $$f(x)g(x) = \frac{\sin^2 x}{x} \quad \text{发散（陷阱 1）}$$
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 4 — $\lim f/g = 0$ 不等于 $\int f$ 收敛</div>
+    <p>$\lim_{x\to\infty} \frac{f(x)}{1/x} = 0$ 只说明 $f$ 衰减比 $1/x$ 快，但可能只快了一点点。</p>
+    <p><strong>反例：</strong> $f(x) = \frac{1}{x \ln x}$，$\lim xf(x) = \lim 1/\ln x = 0$，但 $\int_2^\infty f$ 发散（Bertrand $p=1, q=1$）。</p>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 陷阱 5 — 假瑕点</div>
+    <p>形如 $\int_0^{+\infty} \frac{\cos x - e^{-x}}{x}\,dx$：$x = 0$ 处分子分母都趋于 0，但洛必达给出极限 $\frac{-\sin 0 + e^0}{1} = 1$，有限值。$x = 0$ 是<strong>可去奇点</strong>，不是瑕点！</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s8">第八部分：混合型积分与含参讨论</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-tech">
+    <div class="box-label">方法 — 奇点隔离原则</div>
+    <p>对 $\int_0^{+\infty}$ 型，<strong>必须从中间截断</strong>（通常选 $x = 1$），分别处理两端。<strong>两端都收敛才整体收敛</strong>。</p>
+</div>
+
+<h4>典型含参例题</h4>
+
+<div class="box box-tech">
+    <div class="box-label">例 — $\int_0^{+\infty} \frac{t^a}{1 + t^2}\,dt$ 的收敛域</div>
+    <p>拆为 $\int_0^1 + \int_1^{+\infty}$。</p>
+    <p><strong>在 $0$ 附近：</strong> $1 + t^2 \sim 1$，被积函数 $\sim t^a$，瑕积分需 $a > -1$。</p>
+    <p><strong>在 $+\infty$：</strong> $1 + t^2 \sim t^2$，被积函数 $\sim t^{a-2}$，无穷积分需 $a - 2 < -1$ 即 $a < 1$。</p>
+    <p><strong>收敛条件：$\boxed{-1 < a < 1}$。</strong></p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">例 — $\int_1^{+\infty} \frac{\ln t}{t^a}\,dt$ 的收敛域</div>
+    <p>$\ln t$ 增长极慢：$\forall \varepsilon > 0$，$\ln t \le t^\varepsilon$（$t$ 充分大时）。因此 $\frac{\ln t}{t^a} \le \frac{1}{t^{a-\varepsilon}}$，需 $a - \varepsilon > 1$ 即 $a > 1$。</p>
+    <p>当 $a = 1$：$\int \frac{\ln t}{t}\,dt = \frac{(\ln t)^2}{2} \to +\infty$，发散。</p>
+    <p><strong>收敛条件：$\boxed{a > 1}$。</strong></p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">例 — $\int_0^1 \frac{\ln t}{t^a}\,dt$ 的收敛域</div>
+    <p>瑕积分。换元 $t = 1/u$：</p>
+    $$\int_0^1 \frac{\ln t}{t^a}\,dt = \int_1^{+\infty} \frac{-\ln u}{u^{-a}} \cdot \frac{du}{u^2} = -\int_1^{+\infty} \frac{\ln u}{u^{2-a}}\,du$$
+    <p>由上例，需 $2 - a > 1$ 即 $a < 1$。<strong>收敛条件：$\boxed{a < 1}$。</strong></p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s9">第九部分：高阶拓展（超纲）</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 说明</div>
+    <p>以下内容超出 L1/L2 标准课纲，但在竞赛、Agrégation 以及后续分析课程（泛函分析、概率论）中频繁出现。掌握它们可以在 TD 和 Partiel 中获得额外优势。</p>
+</div>
+
+<h3>1. Gamma 函数 $\Gamma(s)$</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定义与收敛域</div>
+    $$\Gamma(s) = \int_0^{+\infty} t^{s-1} e^{-t}\,dt$$
+    <p><strong>收敛域：$s > 0$。</strong></p>
+    <p>分析：无穷端有 $e^{-t}$ 的指数衰减镇压，必收敛。$0$ 端等价于 $t^{s-1}$，瑕积分需 $s - 1 > -1$ 即 $s > 0$。</p>
+</div>
+
+<div class="box box-beyond">
+    <div class="box-label">关键性质</div>
+    <ul>
+        <li><strong>递推公式：</strong> $\Gamma(s+1) = s \cdot \Gamma(s)$（分部积分一次即得）。</li>
+        <li><strong>与阶乘：</strong> $\Gamma(n+1) = n!$（$n \in \mathbb{N}$）。</li>
+        <li><strong>特殊值：</strong> $\Gamma(1/2) = \sqrt{\pi}$（利用 Gauss 积分 $\int_0^{+\infty} e^{-u^2}\,du = \sqrt{\pi}/2$）。</li>
+    </ul>
+</div>
+
+<details>
+    <summary>递推公式 $\Gamma(s+1) = s\,\Gamma(s)$ 的证明</summary>
+    <div class="proof">
+        <div class="proof-title">证明：</div>
+        $$\Gamma(s+1) = \int_0^{+\infty} t^s e^{-t}\,dt$$
+        <p>分部积分，取 $u = t^s$，$dv = e^{-t}\,dt$：</p>
+        $$= \left[-t^s e^{-t}\right]_0^{+\infty} + \int_0^{+\infty} s\, t^{s-1} e^{-t}\,dt = 0 + s \cdot \Gamma(s)$$
+        <p>（边界项：$t \to +\infty$ 时 $t^s e^{-t} \to 0$；$t \to 0^+$ 时 $t^s \to 0$（$s > 0$）。）</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<h3>2. Beta 函数 $B(p, q)$</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定义与收敛域</div>
+    $$B(p, q) = \int_0^1 t^{p-1}(1-t)^{q-1}\,dt$$
+    <p><strong>收敛域：$p > 0$ 且 $q > 0$。</strong>（两个瑕点 $0$ 和 $1$ 分别需要 $p > 0$ 和 $q > 0$。）</p>
+</div>
+
+<div class="box box-beyond">
+    <div class="box-label">与 Gamma 函数的关系（核心公式）</div>
+    $$B(p, q) = \frac{\Gamma(p)\,\Gamma(q)}{\Gamma(p + q)}$$
+    <p>这个公式将 Beta 函数完全归结为 Gamma 函数，极其强力。</p>
+    <p><strong>应用：</strong> $B(1/2, 1/2) = \frac{\Gamma(1/2)^2}{\Gamma(1)} = \frac{\pi}{1} = \pi$。</p>
+    <p>即 $\int_0^1 \frac{dt}{\sqrt{t(1-t)}} = \pi$。</p>
+</div>
+
+<h3>3. Frullani 积分</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定理 — Frullani 积分</div>
+    <p>若 $f$ 连续，$f(0)$ 和 $\lim_{x \to +\infty} f(x)$ 都存在（有限），则：</p>
+    $$\int_0^{+\infty} \frac{f(ax) - f(bx)}{x}\,dx = \big(f(0) - f(+\infty)\big) \ln \frac{b}{a} \qquad (a, b > 0)$$
+</div>
+
+<details>
+    <summary>Frullani 积分的证明思路</summary>
+    <div class="proof">
+        <div class="proof-title">证明思路：</div>
+        <p>换元 $u = ax$ 和 $u = bx$，利用 $\int_\varepsilon^R \frac{du}{u} = \ln R - \ln \varepsilon$ 的「伸缩」效应：</p>
+        $$\int_\varepsilon^R \frac{f(ax) - f(bx)}{x}\,dx = \int_{a\varepsilon}^{aR} \frac{f(u)}{u}\,du - \int_{b\varepsilon}^{bR} \frac{f(u)}{u}\,du$$
+        $$= \int_{a\varepsilon}^{b\varepsilon} \frac{f(u)}{u}\,du - \int_{aR}^{bR} \frac{f(u)}{u}\,du$$
+        <p>当 $\varepsilon \to 0^+$ 时，第一项中 $f(u) \to f(0)$，积分 $\to f(0)\ln(b/a)$。</p>
+        <p>当 $R \to +\infty$ 时，第二项中 $f(u) \to f(+\infty)$，积分 $\to f(+\infty)\ln(b/a)$。</p>
+        <p>相减得 $(f(0) - f(+\infty))\ln(b/a)$。</p>
+        <p class="qed">$\blacksquare$</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">Frullani 经典应用</div>
+    <p><strong>1.</strong> $f(x) = e^{-x}$，$f(0) = 1$，$f(+\infty) = 0$：</p>
+    $$\int_0^{+\infty} \frac{e^{-ax} - e^{-bx}}{x}\,dx = \ln \frac{b}{a}$$
+    <p><strong>2.</strong> $f(x) = \arctan x$，$f(0) = 0$，$f(+\infty) = \pi/2$：</p>
+    $$\int_0^{+\infty} \frac{\arctan(bx) - \arctan(ax)}{x}\,dx = \frac{\pi}{2}\ln \frac{b}{a}$$
+</div>
+
+<h3>4. Wallis 积分</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">定义与递推</div>
+    $$W_n = \int_0^{\pi/2} \sin^n x\,dx = \int_0^{\pi/2} \cos^n x\,dx$$
+    <p><strong>递推公式</strong>（分部积分得）：$W_n = \frac{n-1}{n}\,W_{n-2}$，$W_0 = \pi/2$，$W_1 = 1$。</p>
+    <p><strong>显式结果：</strong></p>
+    <ul>
+        <li>$n$ 偶数：$W_n = \frac{(n-1)!!}{n!!} \cdot \frac{\pi}{2}$</li>
+        <li>$n$ 奇数：$W_n = \frac{(n-1)!!}{n!!}$</li>
+    </ul>
+</div>
+
+<div class="box box-beyond">
+    <div class="box-label">Wallis 乘积公式与 Stirling 公式</div>
+    <p>由 $W_{2n}/W_{2n+1} \to 1$（夹逼），可导出著名的 <strong>Wallis 乘积</strong>：</p>
+    $$\frac{\pi}{2} = \prod_{n=1}^{\infty} \frac{(2n)(2n)}{(2n-1)(2n+1)} = \frac{2 \cdot 2}{1 \cdot 3} \cdot \frac{4 \cdot 4}{3 \cdot 5} \cdot \frac{6 \cdot 6}{5 \cdot 7} \cdots$$
+    <p>进一步可推出 <strong>Stirling 近似</strong>：$n! \sim \sqrt{2\pi n}\left(\frac{n}{e}\right)^n$。</p>
+</div>
+
+<h3>5. 菲涅尔积分 (Intégrales de Fresnel)</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">结果</div>
+    $$\int_0^{+\infty} \sin(x^2)\,dx = \int_0^{+\infty} \cos(x^2)\,dx = \frac{1}{2}\sqrt{\frac{\pi}{2}}$$
+    <p><strong>收敛性证明：</strong> 令 $t = x^2$，$dx = dt/(2\sqrt{t})$：</p>
+    $$\int_0^{+\infty} \sin(x^2)\,dx = \frac{1}{2}\int_0^{+\infty} \frac{\sin t}{\sqrt{t}}\,dt$$
+    <p>取 $f(t) = \sin t$（原函数有界），$g(t) = 1/\sqrt{t}$（单调 $\to 0$），由 Dirichlet 收敛。但非绝对收敛。</p>
+</div>
+
+<h3>6. Gauss 积分</h3>
+
+<div class="box box-beyond">
+    <div class="box-label">$\int_0^{+\infty} e^{-x^2}\,dx = \frac{\sqrt{\pi}}{2}$</div>
+    <p>收敛性显然（$e^{-x^2}$ 衰减极快）。精确值的经典证法是利用极坐标下的二重积分：</p>
+    <p>设 $I = \int_0^{+\infty} e^{-x^2}\,dx$，则</p>
+    $$I^2 = \int_0^{+\infty}\int_0^{+\infty} e^{-(x^2+y^2)}\,dx\,dy = \int_0^{+\infty} \int_0^{\pi/2} e^{-r^2} r\,d\theta\,dr = \frac{\pi}{2}\int_0^{+\infty} r e^{-r^2}\,dr = \frac{\pi}{4}$$
+    <p>故 $I = \sqrt{\pi}/2$。这也解释了为什么 $\Gamma(1/2) = \sqrt{\pi}$（令 $t = u^2$ 即可归结）。</p>
+</div>
+
+<hr style="border: none; border-top: 2px solid var(--border); margin: 50px 0;">
+
+<div style="text-align: center; color: var(--text-dim); font-size: 0.9em; padding: 20px 0;">
+    <a href="./integral_exercises.html" style="color: var(--blue); text-decoration: none; font-weight: 700; font-size: 1.1em;">进入反常积分特训 →</a>
+    <br><br>
+    <a href="./index.html" style="color: var(--text-dim); text-decoration: none;">← 返回主页</a>
+</div>
+
+<!-- Floating bookmark nav -->
+<div id="bm-fab" onclick="toggleBM()" style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;background:#2563eb;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,0.4);z-index:999;transition:all .2s;color:#fff;font-size:22px;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">
+    <span id="bm-icon">☰</span>
+</div>
+<div id="bm-panel" style="display:none;position:fixed;bottom:88px;right:24px;width:280px;max-height:60vh;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.15);z-index:998;overflow-y:auto;border:1px solid #e2e8f0;">
+    <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-weight:700;font-size:0.95em;color:#1e293b;display:flex;justify-content:space-between;align-items:center;">
+        <span>📑 快速导航</span>
+        <span onclick="toggleBM()" style="cursor:pointer;color:#94a3b8;font-size:18px;">✕</span>
+    </div>
+    <div id="bm-links" style="padding:8px 12px;"></div>
+</div>
+<style>
+#bm-panel { animation: bmSlide .25s ease-out; }
+@keyframes bmSlide { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+#bm-panel a { display:block; padding:10px 12px; color:#334155; text-decoration:none; font-size:0.88em; border-radius:8px; transition:all .15s; line-height:1.4; }
+#bm-panel a:hover { background:#eff6ff; color:#2563eb; }
+#bm-panel a.active { background:#eff6ff; color:#2563eb; font-weight:600; }
+</style>
+<script>
+let bmOpen = false;
+function toggleBM() {
+    bmOpen = !bmOpen;
+    document.getElementById('bm-panel').style.display = bmOpen ? 'block' : 'none';
+    document.getElementById('bm-icon').textContent = bmOpen ? '✕' : '☰';
+}
+(function() {
+    const c = document.getElementById('bm-links');
+    document.querySelectorAll('h2[id]').forEach(h => {
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent.replace(/[▸▾]/g, '').trim();
+        a.onclick = () => setTimeout(() => toggleBM(), 150);
+        c.appendChild(a);
+    });
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            const link = c.querySelector('a[href="#' + e.target.id + '"]');
+            if (link) link.classList.toggle('active', e.isIntersecting);
+        });
+    }, { rootMargin: '-10% 0px -75% 0px' });
+    document.querySelectorAll('h2[id]').forEach(h => obs.observe(h));
+})();
+</script>
+
+</body>
+</html>

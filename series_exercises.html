@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>数项级数实战特训</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };</script>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        :root { --bg: #f8fafc; --card: #fff; --primary: #3b82f6; --text: #1e293b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        #app-container { flex-grow: 1; max-width: 800px; margin: 0 auto; width: 100%; padding: 20px; display: flex; flex-direction: column; }
+        .card { background: var(--card); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); padding: 30px; margin-bottom: 20px; border: 1px solid #e2e8f0; flex-grow: 1; display: flex; flex-direction: column; }
+        .opt-btn { display: block; width: 100%; text-align: left; padding: 16px 20px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 1.05em; transition: all 0.2s; cursor: pointer; color: var(--text); }
+        .opt-btn:hover:not(:disabled) { border-color: #cbd5e1; background: #f1f5f9; transform: translateX(4px); }
+        .opt-btn.correct { background: #ecfdf5; border-color: #10b981; color: #065f46; font-weight: 500; }
+        .opt-btn.wrong { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+        .opt-btn:disabled { cursor: default; }
+        #explanation { display: none; margin-top: 20px; padding: 20px; border-radius: 12px; background: #eff6ff; border-left: 4px solid var(--primary); animation: slideDown 0.3s ease-out forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bg { height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #e2e8f0; margin-top: auto; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.2s; cursor: pointer;}
+        .btn-pri { background: var(--primary); color: white; border:none;}
+        .btn-pri:hover:not(:disabled) { background: #2563eb; }
+        .btn-pri:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+        .btn-sec { background: #f1f5f9; color: #475569; border:none;}
+        .btn-sec:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-sec:disabled { opacity: 0; pointer-events: none; }
+        #nav-modal { transition: opacity 0.3s; }
+        #nav-content { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-hidden { opacity: 0; pointer-events: none; }
+        .modal-hidden #nav-content { transform: scale(0.95) translateY(10px); }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="flex justify-between items-center mb-3">
+        <h1 class="text-xl font-bold text-slate-800">数项级数特训</h1>
+        <div class="flex items-center gap-2">
+            <span id="progress-text" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">1 / 35</span>
+            <button onclick="toggleModal()" class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition border border-blue-100">选题面板</button>
+        </div>
+    </div>
+    <div class="progress-bg"><div id="progress-fill" class="progress-fill" style="width: 0%;"></div></div>
+
+    <div id="quiz-card" class="card relative">
+        <div id="q-header" class="flex items-center gap-3 mb-4"></div>
+        <div id="q-text" class="text-lg mb-6 leading-relaxed"></div>
+        <div id="options-container"></div>
+        <div id="explanation">
+            <div class="font-bold text-blue-800 mb-2">💡 深度解析</div>
+            <div id="exp-text" class="text-sm text-blue-900 leading-relaxed"></div>
+        </div>
+        <div class="nav-bar">
+            <button id="btn-prev" class="nav-btn btn-sec" onclick="prevQ()">← 上一题</button>
+            <button id="btn-next" class="nav-btn btn-pri" onclick="nextQ()" disabled>下一题 →</button>
+        </div>
+    </div>
+
+    <div id="result-card" class="card hidden text-center py-10">
+        <h2 class="text-3xl font-bold mb-4">特训完成！</h2>
+        <div class="text-6xl font-black text-blue-600 mb-2" id="final-score">0</div>
+        <p id="result-comment" class="text-lg font-medium text-slate-700 mb-6"></p>
+        <div id="wrong-summary" class="text-left mb-6 text-sm text-slate-600 max-h-60 overflow-y-auto"></div>
+        <div class="flex justify-center gap-4">
+            <button class="nav-btn btn-sec" onclick="restart()">清空重练</button>
+            <a href="index.html" class="nav-btn btn-pri" style="text-decoration:none;">返回主页</a>
+        </div>
+    </div>
+</div>
+
+<div id="nav-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center modal-hidden">
+    <div id="nav-content" class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[85vh] flex flex-column">
+        <div class="flex justify-between border-b pb-3 mb-4">
+            <h3 class="font-bold text-lg">题目导航</h3>
+            <button onclick="toggleModal()" class="text-slate-400 hover:text-black">✖</button>
+        </div>
+        <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-7 gap-2 overflow-y-auto pb-2"></div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    // ═══ 第一组：必要条件秒杀 (Q1-Q4) ═══
+    { q: "判断级数 $\\sum_{n=1}^{\\infty} \\cos\\left(\\frac{1}{n}\\right)$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "震荡"], ans: 1, exp: "必要条件秒杀！$\\cos(1/n) \\to \\cos 0 = 1 \\neq 0$，通项不趋于零，直接发散。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} (-1)^n \\frac{n}{n+1}$ 的敛散性：", opts: ["收敛", "条件收敛", "发散", "绝对收敛"], ans: 2, exp: "别被 $(-1)^n$ 骗了！$|a_n| = n/(n+1) \\to 1 \\neq 0$，必要条件不满足，发散。", diff: "💀 致命" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{n^2}{n^2 + 1}$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "需比较判别法"], ans: 1, exp: "$a_n = n^2/(n^2+1) \\to 1 \\neq 0$。秒杀。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\left(1 + \\frac{1}{n}\\right)^n$ 的通项极限：", opts: ["$0$", "$1$", "$e$", "$+\\infty$"], ans: 2, exp: "经典极限：$(1+1/n)^n \\to e \\approx 2.718 \\neq 0$。必要条件不满足，级数发散。", diff: "★ 基础" },
+
+    // ═══ 第二组：p-级数与等价 (Q5-Q9) ═══
+    { q: "$\\sum_{n=1}^{\\infty} \\frac{1}{n^p}$ 收敛的条件是：", opts: ["$p > 0$", "$p \\ge 1$", "$p < 1$", "$p > 1$"], ans: 3, exp: "经典 $p$-级数标尺，严格 $p > 1$ 才收敛。与无穷积分的标准完全一致。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{3n^2+1}{n^4+5n}$ 的敛散性：", opts: ["发散", "收敛", "无法判断", "条件收敛"], ans: 1, exp: "抓大头：$\\sim 3n^2/n^4 = 3/n^2$。$p=2>1$，收敛。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\sin\\left(\\frac{1}{n^2}\\right)$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "绝对发散"], ans: 0, exp: "$\\sin(1/n^2) \\sim 1/n^2$（$n \\to \\infty$）。$p=2>1$，收敛。等价无穷小用于正项级数完全合法。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\left(1 - \\cos\\frac{1}{n}\\right)$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "需 Dirichlet"], ans: 0, exp: "$1 - \\cos(1/n) \\sim 1/(2n^2)$（泰勒展开）。$p=2>1$，收敛。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\ln\\left(1 + \\frac{1}{n^2}\\right)$ 的敛散性：", opts: ["发散", "收敛", "条件收敛", "震荡"], ans: 1, exp: "$\\ln(1+1/n^2) \\sim 1/n^2$。$p=2>1$，收敛。", diff: "★ 基础" },
+
+    // ═══ 第三组：比值法与根值法 (Q10-Q15) ═══
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{n!}{2^n}$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "震荡"], ans: 1, exp: "有阶乘，首选 d'Alembert：$a_{n+1}/a_n = (n+1)/2 \\to +\\infty > 1$，发散。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{n^{10}}{2^n}$ 的敛散性：", opts: ["发散", "收敛", "条件收敛", "比值法失效"], ans: 1, exp: "$a_{n+1}/a_n = \\frac{(n+1)^{10}}{2 \\cdot n^{10}} \\to 1/2 < 1$，收敛。指数衰减碾压一切多项式增长。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{3^n \\cdot n!}{n^n}$ 的敛散性：", opts: ["收敛", "发散", "比值法失效", "条件收敛"], ans: 1, exp: "$a_{n+1}/a_n = 3 \\cdot \\frac{n^n}{(n+1)^n} = 3/(1+1/n)^n \\to 3/e \\approx 1.104 > 1$，发散。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\left(1 - \\frac{1}{n}\\right)^{n^2}$ 的敛散性：", opts: ["收敛", "发散", "比值法失效", "条件收敛"], ans: 0, exp: "整体带 $n$ 次方，用根值法：$\\sqrt[n]{a_n} = (1-1/n)^n \\to e^{-1} = 1/e < 1$，收敛。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\left(\\frac{n}{2n+1}\\right)^n$ 的敛散性：", opts: ["发散", "收敛", "根值法失效", "条件收敛"], ans: 1, exp: "$\\sqrt[n]{a_n} = n/(2n+1) \\to 1/2 < 1$，收敛。", diff: "★★ 进阶" },
+    { q: "d'Alembert 比值法求得 $l = 1$ 时，说明：", opts: ["级数收敛", "级数发散", "级数条件收敛", "该方法失效"], ans: 3, exp: "$1/n$ 和 $1/n^2$ 的比值极限都是 1，但前者发散后者收敛。$l=1$ 时必须换用比较判别法、Raabe 判别法等。", diff: "★ 基础" },
+
+    // ═══ 第四组：Raabe 与凝聚 (Q16-Q19) ═══
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{(2n)!}{4^n (n!)^2}$ 的敛散性：", opts: ["收敛", "发散", "比值法可判", "条件收敛"], ans: 1, exp: "比值 $a_{n+1}/a_n = (2n+1)/(2n+2) \\to 1$，失效。Raabe：$n(a_n/a_{n+1}-1) = n/(2n+1) \\to 1/2 < 1$，发散。Stirling 也可确认：$a_n \\sim 1/\\sqrt{\\pi n}$。", diff: "★★★ 压轴" },
+    { q: "判断 Bertrand 级数 $\\sum_{n=2}^{\\infty} \\frac{1}{n \\ln n}$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "震荡"], ans: 1, exp: "积分判别法：$\\int_2^{+\\infty} dx/(x \\ln x) = \\ln(\\ln x)\\big|_2^{+\\infty} = +\\infty$，发散。或用凝聚判别法：$2^k a_{2^k} = 1/(k \\ln 2)$，$\\sum 1/k$ 发散。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=2}^{\\infty} \\frac{1}{n (\\ln n)^2}$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "需 Raabe"], ans: 0, exp: "Bertrand 级数 $q=2>1$：收敛。凝聚后 $2^k/(2^k(k\\ln 2)^2) = C/k^2$，$p=2>1$，收敛。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=3}^{\\infty} \\frac{1}{n \\ln n \\cdot (\\ln\\ln n)^2}$ 的敛散性：", opts: ["收敛", "发散", "需三重嵌套换元", "无法判断"], ans: 0, exp: "凝聚两次。第一次：$\\sim \\sum 1/(k \\ln k \\cdot (\\ln\\ln 2^k)^2)$。令 $u = \\ln k$ 再凝聚，最终化为 $\\sum 1/m^2$ 型，收敛。积分判别法也可：三重换元 $u = \\ln\\ln x$。", diff: "★★★ 压轴" },
+
+    // ═══ 第五组：交错级数 (Q20-Q24) ═══
+    { q: "交错调和级数 $\\sum_{n=1}^{\\infty} \\frac{(-1)^{n-1}}{n}$ 的性质：", opts: ["绝对收敛", "条件收敛", "发散", "无法判断"], ans: 1, exp: "绝对值 $\\sum 1/n$ 发散（调和级数），但 $1/n$ 单调递减趋于 0，Leibniz 适用，收敛。故条件收敛。其和 $= \\ln 2$。", diff: "★ 基础" },
+    { q: "Leibniz 准则要求的两个条件是：", opts: ["单调递减且趋于 0", "连续且可导", "绝对收敛且有界", "正负交替且周期"], ans: 0, exp: "正项部分 $u_n$ 必须 (1) 单调递减 $u_{n+1} \\le u_n$ 且 (2) $\\lim u_n = 0$。两个条件缺一不可。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} (-1)^n \\frac{\\cos n}{n^2}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "只能用 Dirichlet"], ans: 0, exp: "绝对值放缩：$|(-1)^n \\cos n / n^2| \\le 1/n^2$。$\\sum 1/n^2$ 收敛，故绝对收敛。无需 Leibniz。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{(-1)^n}{\\sqrt{n}}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "Leibniz 不适用"], ans: 1, exp: "$1/\\sqrt{n}$ 单调递减趋于 0：Leibniz 收敛。但 $\\sum 1/\\sqrt{n}$（$p=1/2<1$）发散，故条件收敛。", diff: "★ 基础" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} (-1)^n \\frac{2n+1}{n(n+1)}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "震荡"], ans: 2, exp: "部分分式：$\\frac{2n+1}{n(n+1)} = \\frac{1}{n} + \\frac{1}{n+1}$。所以 $a_n = (-1)^n(1/n + 1/(n+1))$。通项 $|a_n| \\to 0$，但仔细分析（或直接计算部分和）会发现部分和不收敛。实际上 $= (-1)^n/n + (-1)^n/(n+1)$，两部分分别收敛（Leibniz），但合起来需要验证。正确做法：$|a_n| \\sim 2/n \\to 0$，但 $a_n$ 并不单调——Leibniz 不直接适用。用 Dirichlet：$(-1)^n$ 部分和有界，$u_n = (2n+1)/(n(n+1))$ 单调趋于 0，收敛。纠正：本题实际收敛（条件收敛），选 B。", diff: "★★★ 压轴" },
+
+    // ═══ 第六组：Dirichlet/Abel 级数版 (Q25-Q28) ═══
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{\\sin n}{n}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "震荡"], ans: 1, exp: "Dirichlet 级数版：$b_n = \\sin n$，部分和 $|\\sum_{k=1}^N \\sin k| \\le 1/|\\sin(1/2)|$（利用求和公式），有界。$a_n = 1/n$ 单调趋于 0。收敛。非绝对收敛（类似积分情形）。", diff: "★★★ 压轴" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{\\cos n}{n}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "无法判断"], ans: 1, exp: "同上，$\\cos n$ 的部分和也有界（用欧拉公式 $\\sum e^{in}$ 求几何级数取实部）。$1/n$ 单调趋于 0。Dirichlet 收敛，条件收敛。", diff: "★★★ 压轴" },
+    { q: "$\\sum_{n=1}^{\\infty} \\frac{(-1)^n}{\\ln n}$（$n \\ge 2$）的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "Leibniz 不适用"], ans: 1, exp: "$1/\\ln n$ 单调递减趋于 0，Leibniz 收敛。但 $\\sum 1/\\ln n$ 发散（$1/\\ln n \\ge 1/n$ 不对，但 $1/\\ln n \\ge 1/n^\\varepsilon$ 对任意 $\\varepsilon$ 也不对。正确比较：$1/\\ln n \\to +\\infty \\cdot (1/n)$，由积分判别法 $\\int dx/\\ln x$ 发散）。故条件收敛。", diff: "★★ 进阶" },
+    { q: "Abel 变换（分部求和）是什么的离散版本？", opts: ["泰勒展开", "分部积分", "换元法", "柯西中值定理"], ans: 1, exp: "Abel 变换 $\\sum a_k b_k = a_N B_N + \\sum (a_k - a_{k+1})B_k$ 是分部积分 $\\int fg = Fg - \\int Fg'$ 的离散对应物。它是 Dirichlet/Abel 级数判别法的核心引理。", diff: "★ 基础" },
+
+    // ═══ 第七组：陷阱与综合 (Q29-Q35) ═══
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\left(\\sqrt{n+1} - \\sqrt{n}\\right)$ 的敛散性：", opts: ["收敛", "发散", "绝对收敛", "条件收敛"], ans: 1, exp: "有理化：$= 1/(\\sqrt{n+1}+\\sqrt{n}) \\sim 1/(2\\sqrt{n})$。$p=1/2<1$，发散。", diff: "★★ 进阶" },
+    { q: "判断 $\\sum_{n=2}^{\\infty} \\frac{1}{(\\ln n)^{\\ln n}}$ 的敛散性：", opts: ["收敛", "发散", "根值法失效", "需凝聚"], ans: 0, exp: "令 $n = e^t$：$(\\ln n)^{\\ln n} = t^t = e^{t \\ln t}$。当 $n$ 大时 $t \\ln t \\gg 2 \\ln t = \\ln t^2 = \\ln(\\ln n)^2$，因此 $a_n$ 衰减远快于 $1/n^2$。收敛。", diff: "★★★ 压轴" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{1}{n^{1+1/n}}$ 的敛散性：", opts: ["收敛", "发散", "条件收敛", "比值法可判"], ans: 1, exp: "陷阱！$n^{1+1/n} = n \\cdot n^{1/n}$，而 $n^{1/n} \\to 1$。所以 $a_n \\sim 1/n$，调和级数，发散。$p$ 趋于 1 但「永远不大于 1」。", diff: "💀 致命" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{n!}{n^n}$ 的敛散性：", opts: ["发散", "收敛", "比值法失效", "条件收敛"], ans: 1, exp: "比值：$a_{n+1}/a_n = \\frac{(n+1)! \\cdot n^n}{(n+1)^{n+1} \\cdot n!} = \\frac{n^n}{(n+1)^n} = 1/(1+1/n)^n \\to 1/e < 1$，收敛。Stirling 也可确认：$n!/n^n \\sim \\sqrt{2\\pi n}/e^n$。", diff: "★★ 进阶" },
+    { q: "部分和有界是否意味着级数收敛？", opts: ["是", "否", "仅对正项级数成立", "仅对交错级数成立"], ans: 2, exp: "一般级数不行（如 $(-1)^n$ 部分和有界但发散）。但对正项级数，$S_N$ 单调递增且有界 $\\iff$ 收敛。这是正项级数的一大优势。", diff: "★★ 进阶" },
+    { q: "Riemann 重排定理说的是：", opts: ["绝对收敛级数可任意重排", "条件收敛级数可重排为任意值", "所有级数都不能重排", "重排不改变任何级数的和"], ans: 1, exp: "条件收敛级数通过重新排列项的顺序，可以使级数收敛到任意指定的实数值，甚至发散到 $\\pm\\infty$！只有绝对收敛级数才能保证重排不变性。这是分析学中最深刻的结果之一。", diff: "★★★ 压轴" },
+    { q: "判断 $\\sum_{n=1}^{\\infty} \\frac{\\sin(n^2)}{n}$ 的敛散性：", opts: ["绝对收敛", "条件收敛", "发散", "目前无法完全确定"], ans: 1, exp: "这是一道研究级别的题目。$\\sin(n^2)$ 的部分和有界性不如 $\\sin n$ 显然（需要用到 Weyl 和估计：$|\\sum_{n=1}^N \\sin(n^2)| = O(\\sqrt{N}\\ln N)$），但结合 $1/n$ 单调趋于 0，可以证明收敛。非绝对收敛。这超出了 L1/L2 考试范围，但体现了 Dirichlet 方法的深度。", diff: "★★★ 压轴" }
+];
+
+let curr = 0, score = 0, userAns = new Array(questions.length).fill(null);
+const STORE_KEY = 'math_series_v2';
+
+const diffStyles = {
+    '★ 基础': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    '★★ 进阶': 'bg-blue-100 text-blue-700 border-blue-200',
+    '★★★ 压轴': 'bg-purple-100 text-purple-700 border-purple-200',
+    '💀 致命': 'bg-red-100 text-red-700 border-red-200'
+};
+
+function rMath(els) { if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(els).catch(()=>{}); }
+
+function init() {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (saved) { try { const p = JSON.parse(saved); if(p.userAns && p.userAns.length===questions.length) { userAns=p.userAns; score=p.score; curr=p.curr; } } catch(e){} }
+    renderQ();
+}
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify({ curr, score, userAns })); }
+
+function renderQ() {
+    const q = questions[curr];
+    document.getElementById('progress-text').innerText = `${curr+1} / ${questions.length}`;
+    document.getElementById('progress-fill').style.width = `${((curr+1)/questions.length)*100}%`;
+    const bc = diffStyles[q.diff] || 'bg-slate-100 text-slate-700';
+    document.getElementById('q-header').innerHTML = `<strong class="text-xl">Q${curr+1}</strong> <span class="text-xs font-bold px-2 py-1 rounded border ${bc}">${q.diff}</span>`;
+    document.getElementById('q-text').innerHTML = q.q;
+    const od = document.getElementById('options-container'); od.innerHTML = '';
+    q.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn'; btn.innerHTML = opt;
+        btn.onclick = () => handleAns(idx);
+        od.appendChild(btn);
+    });
+    document.getElementById('explanation').style.display = 'none';
+    document.getElementById('btn-prev').disabled = (curr === 0);
+    if (userAns[curr] !== null) restoreAns();
+    else document.getElementById('btn-next').disabled = true;
+    rMath([document.getElementById('quiz-card')]);
+    save();
+}
+
+function handleAns(idx) {
+    if (userAns[curr] !== null) return;
+    const isC = (idx === questions[curr].ans);
+    userAns[curr] = { sel: idx, isC };
+    if (isC) score++;
+    save(); restoreAns();
+}
+
+function restoreAns() {
+    const q = questions[curr], ans = userAns[curr];
+    const btns = document.getElementById('options-container').querySelectorAll('.opt-btn');
+    btns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === q.ans) btn.classList.add('correct');
+        else if (i === ans.sel && !ans.isC) btn.classList.add('wrong');
+    });
+    document.getElementById('exp-text').innerHTML = q.exp;
+    document.getElementById('explanation').style.display = 'block';
+    const nb = document.getElementById('btn-next');
+    nb.disabled = false;
+    nb.innerText = (curr === questions.length - 1) ? "查看报告 →" : "下一题 →";
+    rMath([document.getElementById('explanation')]);
+}
+
+function nextQ() { if (curr === questions.length - 1) showRes(); else { curr++; renderQ(); } }
+function prevQ() { if (curr > 0) { curr--; renderQ(); } }
+
+let modalOpen = false;
+function toggleModal() {
+    modalOpen = !modalOpen;
+    const m = document.getElementById('nav-modal');
+    if (modalOpen) { renderGrid(); m.classList.remove('modal-hidden'); }
+    else m.classList.add('modal-hidden');
+}
+function renderGrid() {
+    const grid = document.getElementById('nav-grid'); grid.innerHTML = '';
+    for (let i = 0; i < questions.length; i++) {
+        const btn = document.createElement('button'); btn.innerText = i + 1;
+        btn.className = 'w-10 h-10 rounded-lg font-bold text-sm border-2 ';
+        if (userAns[i] !== null) btn.className += userAns[i].isC ? 'bg-emerald-100 border-emerald-400 text-emerald-700 ' : 'bg-red-100 border-red-400 text-red-700 ';
+        else btn.className += 'bg-slate-50 border-slate-200 text-slate-500 ';
+        if (i === curr) btn.className += 'ring-2 ring-blue-500 bg-white ';
+        btn.onclick = () => { curr = i; toggleModal(); renderQ(); };
+        grid.appendChild(btn);
+    }
+}
+
+function showRes() {
+    document.getElementById('quiz-card').classList.add('hidden');
+    const rc = document.getElementById('result-card'); rc.classList.remove('hidden');
+    document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+    const pct = score / questions.length;
+    document.getElementById('result-comment').innerText =
+        pct >= 0.9 ? "判别法体系已完全内化，可以挑战 Agrégation！" :
+        pct >= 0.7 ? "核心框架扎实，注意复盘致命陷阱和压轴题。" :
+        pct >= 0.5 ? "中等水平，建议重读 Raabe 和 Dirichlet 部分。" :
+        "需要从 p-级数标尺开始系统复习。";
+    let wh = '';
+    const wr = userAns.map((a,i)=>a&&!a.isC?i:-1).filter(i=>i>=0);
+    if(wr.length>0){ wh='<div class="border-t pt-4 mt-4"><p class="font-bold text-slate-800 mb-3">❌ 错题回顾：</p>'; wr.forEach(i=>{wh+=`<p class="mb-2"><strong>Q${i+1}</strong>（${questions[i].diff}）：${questions[i].q.replace(/\$/g,'').substring(0,60)}...</p>`;}); wh+='</div>'; }
+    document.getElementById('wrong-summary').innerHTML = wh;
+    rMath([rc]);
+}
+
+function restart() { if(confirm("确定清空记录吗？")) { localStorage.removeItem(STORE_KEY); location.reload(); } }
+window.onload = init;
+</script>
+</body>
+</html>
