@@ -91,6 +91,7 @@
         <li><a href="#s9">绝对收敛与条件收敛</a></li>
         <li><a href="#s10">经典反例与致命陷阱</a></li>
         <li><a href="#s11">高阶拓展：Euler 常数、Stirling 公式与 $\zeta$ 函数</a></li>
+        <li><a href="#s12">常见与特殊级数公式速查（考前必背）</a></li>
     </ol>
 </div>
 
@@ -504,6 +505,150 @@
         <li><strong>Abel 求和 + 逐项求导/积分：</strong> 对幂级数 $\sum a_n x^n$ 操作后取 $x = 1$。如 $\sum 1/n^2$ 可由 $-\ln(1-x)/x$ 的积分推导。</li>
     </ul>
 </div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s12">第十二部分：常见与特殊级数公式速查（考前必背）</h2>
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="box box-warn">
+    <div class="box-label">⚠ 为什么要背？</div>
+    <p>判别法解决<strong>敛散性</strong>，而本节解决<strong>求和</strong>。考场上一旦遇到「请计算 $\sum 1/n!$」「证明 $\sum (-1)^{n-1}/n = \ln 2$」之类的题目，没有现成公式只能从泰勒展开或幂级数硬推，极易翻车。下面的公式来自 $e^x$、$\ln(1+x)$、$\arctan x$、$1/(1-x)$ 等基本初等函数在收敛域端点的取值，请<strong>整体记忆</strong>。</p>
+</div>
+
+<h3>1. 几何级数族（$1/(1-x)$ 及其导数/积分）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">公式 — 几何级数与衍生</div>
+    <p>母函数 $\dfrac{1}{1-x} = \sum_{n=0}^{\infty} x^n$（$|x| < 1$），逐项求导/积分得到一族公式：</p>
+    $$\sum_{n=0}^{\infty} x^n = \frac{1}{1-x}, \qquad \sum_{n=1}^{\infty} n x^{n-1} = \frac{1}{(1-x)^2}, \qquad \sum_{n=1}^{\infty} n^2 x^{n-1} = \frac{1+x}{(1-x)^3}$$
+    $$\sum_{n=1}^{\infty} \frac{x^n}{n} = -\ln(1-x), \qquad \sum_{n=0}^{\infty} \binom{n+k}{k} x^n = \frac{1}{(1-x)^{k+1}}$$
+    <p><strong>取 $x = 1/2$ 的常用值：</strong> $\sum 1/2^n = 2$（从 $n=0$）、$\sum n/2^n = 2$、$\sum n^2/2^n = 6$。</p>
+</div>
+
+<h3>2. 指数级数族（$e$ 的多种拆解）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">公式 — $e^x$ 的泰勒展开（核心母函数）</div>
+    $$\boxed{\;e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!} \quad (\forall x \in \mathbb{R})\;}$$
+    <p>由此立刻得到 $e$ 的若干等价表达，<strong>这是考场上最常被遗忘的一组</strong>：</p>
+    <table>
+        <tr><th>取值</th><th>公式</th><th>说明</th></tr>
+        <tr><td>$x = 1$</td><td>$\displaystyle e = \sum_{n=0}^{\infty} \frac{1}{n!} = 1 + 1 + \frac{1}{2!} + \frac{1}{3!} + \cdots$</td><td>最经典定义</td></tr>
+        <tr><td>$x = -1$</td><td>$\displaystyle \frac{1}{e} = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!}$</td><td>交错版本</td></tr>
+        <tr><td>从 $n=1$</td><td>$\displaystyle \sum_{n=1}^{\infty} \frac{1}{n!} = e - 1$</td><td>去掉首项</td></tr>
+        <tr><td>偶/奇拆分</td><td>$\displaystyle \sum_{n=0}^{\infty} \frac{1}{(2n)!} = \frac{e + e^{-1}}{2} = \cosh 1$</td><td>双曲余弦</td></tr>
+        <tr><td>偶/奇拆分</td><td>$\displaystyle \sum_{n=0}^{\infty} \frac{1}{(2n+1)!} = \frac{e - e^{-1}}{2} = \sinh 1$</td><td>双曲正弦</td></tr>
+        <tr><td>带 $n$ 因子</td><td>$\displaystyle \sum_{n=1}^{\infty} \frac{n}{n!} = \sum_{n=1}^{\infty} \frac{1}{(n-1)!} = e$</td><td>消去 $n$，下标平移</td></tr>
+        <tr><td>带 $n^2$ 因子</td><td>$\displaystyle \sum_{n=1}^{\infty} \frac{n^2}{n!} = 2e$</td><td>$n^2 = n(n-1) + n$ 拆分</td></tr>
+        <tr><td>带 $1/(n+1)$</td><td>$\displaystyle \sum_{n=0}^{\infty} \frac{1}{(n+1)!} = e - 1$</td><td>下标平移</td></tr>
+    </table>
+</div>
+
+<details>
+    <summary>$\sum n^2/n!$ 的代数技巧（必看）</summary>
+    <div class="proof">
+        <div class="proof-title">技巧：把 $n^2$ 写成下降阶乘 $n(n-1) + n$</div>
+        <p>$$\sum_{n=1}^{\infty} \frac{n^2}{n!} = \sum_{n=1}^{\infty} \frac{n(n-1)}{n!} + \sum_{n=1}^{\infty} \frac{n}{n!} = \sum_{n=2}^{\infty} \frac{1}{(n-2)!} + \sum_{n=1}^{\infty} \frac{1}{(n-1)!} = e + e = 2e$$</p>
+        <p><strong>推广：</strong> 任意多项式 $P(n)$ 都可写成下降阶乘 $n^{\underline k} = n(n-1)\cdots(n-k+1)$ 的线性组合，每一块都能消去 $n!$ 的对应因子，最终化为若干个 $e$ 的线性组合。这是处理 $\sum P(n)/n!$ 的<strong>万能套路</strong>。</p>
+        <p>例：$\sum_{n=0}^{\infty} \frac{n^3 + 1}{n!} = \sum \frac{n(n-1)(n-2) + 3n(n-1) + n + 1}{n!} = e + 3e + e + e = 6e$（验证留作练习）。</p>
+    </div>
+</details>
+
+<div class="box box-tech">
+    <div class="box-label">速查 — 常用 $e^x$ 取值</div>
+    <ul>
+        <li>$\displaystyle \sum_{n=0}^{\infty} \frac{2^n}{n!} = e^2$，$\displaystyle \sum_{n=0}^{\infty} \frac{1}{2^n n!} = e^{1/2} = \sqrt{e}$。</li>
+        <li>更一般地，<strong>看到 $\sum a^n/n!$ 直接写 $e^a$</strong>，看到 $\sum (-a)^n/n!$ 写 $e^{-a}$。</li>
+    </ul>
+</div>
+
+<h3>3. 对数级数族（$\ln(1+x)$）</h3>
+
+<div class="box box-thm">
+    <div class="box-label">公式 — 对数泰勒展开</div>
+    $$\ln(1+x) = \sum_{n=1}^{\infty} \frac{(-1)^{n-1} x^n}{n} = x - \frac{x^2}{2} + \frac{x^3}{3} - \cdots \quad (-1 < x \le 1)$$
+    $$-\ln(1-x) = \sum_{n=1}^{\infty} \frac{x^n}{n} = x + \frac{x^2}{2} + \frac{x^3}{3} + \cdots \quad (-1 \le x < 1)$$
+    <p><strong>典型取值：</strong></p>
+    <ul>
+        <li>$x = 1$：$\displaystyle \sum_{n=1}^{\infty} \frac{(-1)^{n-1}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \cdots = \ln 2$（条件收敛！经典代表）。</li>
+        <li>$x = 1/2$：$\displaystyle \sum_{n=1}^{\infty} \frac{1}{n \cdot 2^n} = \ln 2$。</li>
+        <li>两式相加：$\displaystyle \frac{1}{2}\ln\frac{1+x}{1-x} = \sum_{n=0}^{\infty} \frac{x^{2n+1}}{2n+1}$（仅奇次项），是 $\operatorname{artanh} x$。</li>
+    </ul>
+</div>
+
+<h3>4. 三角与反三角级数族</h3>
+
+<div class="box box-thm">
+    <div class="box-label">公式 — $\sin, \cos, \arctan$</div>
+    $$\sin x = \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n+1}}{(2n+1)!}, \qquad \cos x = \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n}}{(2n)!} \quad (\forall x)$$
+    $$\arctan x = \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n+1}}{2n+1} = x - \frac{x^3}{3} + \frac{x^5}{5} - \cdots \quad (|x| \le 1)$$
+    <p><strong>典型取值（Leibniz）：</strong> $x = 1$ 给出</p>
+    $$\sum_{n=0}^{\infty} \frac{(-1)^n}{2n+1} = 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \cdots = \frac{\pi}{4}$$
+    <p>这是另一个最经典的<strong>条件收敛</strong>级数。注意它收敛极慢（误差量级 $1/N$），实际计算 $\pi$ 时不用它。</p>
+</div>
+
+<h3>5. 望远镜与部分分式经典款</h3>
+
+<div class="box box-tech">
+    <div class="box-label">公式 — 部分分式 → 望远镜</div>
+    <ul>
+        <li>$\displaystyle \sum_{n=1}^{\infty} \frac{1}{n(n+1)} = \sum \left(\frac{1}{n} - \frac{1}{n+1}\right) = 1$。</li>
+        <li>$\displaystyle \sum_{n=1}^{\infty} \frac{1}{n(n+1)(n+2)} = \frac{1}{4}$（拆成 $\tfrac{1}{2}\left[\tfrac{1}{n(n+1)} - \tfrac{1}{(n+1)(n+2)}\right]$）。</li>
+        <li>$\displaystyle \sum_{n=1}^{\infty} \frac{1}{4n^2 - 1} = \sum \frac{1}{(2n-1)(2n+1)} = \frac{1}{2}\sum\left(\frac{1}{2n-1} - \frac{1}{2n+1}\right) = \frac{1}{2}$。</li>
+        <li>$\displaystyle \sum_{n=2}^{\infty} \frac{1}{n^2 - 1} = \frac{1}{2}\sum\left(\frac{1}{n-1} - \frac{1}{n+1}\right) = \frac{3}{4}$（注意补头尾）。</li>
+    </ul>
+    <p><strong>方法论：</strong> 见到分母是相邻整数乘积，<strong>第一反应是部分分式 + 望远镜</strong>。</p>
+</div>
+
+<h3>6. $\zeta(s)$ 特殊值与交错版</h3>
+
+<div class="box box-thm">
+    <div class="box-label">公式 — Riemann $\zeta$ 与 Dirichlet $\eta$</div>
+    <p><strong>Basel 家族（偶数 $\zeta$ 值）：</strong></p>
+    $$\zeta(2) = \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}, \quad \zeta(4) = \sum_{n=1}^{\infty} \frac{1}{n^4} = \frac{\pi^4}{90}, \quad \zeta(6) = \frac{\pi^6}{945}$$
+    <p><strong>交错版（Dirichlet $\eta$ 函数）：</strong> $\eta(s) = \sum_{n=1}^{\infty} (-1)^{n-1}/n^s = (1 - 2^{1-s}) \zeta(s)$。</p>
+    <ul>
+        <li>$\displaystyle \eta(1) = \sum \frac{(-1)^{n-1}}{n} = \ln 2$。</li>
+        <li>$\displaystyle \eta(2) = \sum \frac{(-1)^{n-1}}{n^2} = \frac{\pi^2}{12}$。</li>
+        <li>$\displaystyle \eta(4) = \frac{7\pi^4}{720}$。</li>
+    </ul>
+    <p><strong>奇数项与偶数项拆分：</strong> $\sum 1/(2n)^2 = \zeta(2)/4 = \pi^2/24$，故 $\sum 1/(2n-1)^2 = \zeta(2) - \pi^2/24 = \pi^2/8$。</p>
+</div>
+
+<div class="box box-tech">
+    <div class="box-label">速查总表 — 一页背完</div>
+    <table>
+        <tr><th>级数</th><th>和</th><th>来源</th></tr>
+        <tr><td>$\sum_{n=0}^{\infty} 1/n!$</td><td>$e$</td><td>$e^x$ at $x=1$</td></tr>
+        <tr><td>$\sum_{n=0}^{\infty} (-1)^n/n!$</td><td>$1/e$</td><td>$e^x$ at $x=-1$</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} n/n!$</td><td>$e$</td><td>下标平移</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} n^2/n!$</td><td>$2e$</td><td>$n^2 = n(n-1)+n$</td></tr>
+        <tr><td>$\sum_{n=0}^{\infty} 1/(2n)!$</td><td>$\cosh 1 = (e + 1/e)/2$</td><td>偶项</td></tr>
+        <tr><td>$\sum_{n=0}^{\infty} 1/(2n+1)!$</td><td>$\sinh 1 = (e - 1/e)/2$</td><td>奇项</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} (-1)^{n-1}/n$</td><td>$\ln 2$</td><td>$\ln(1+x)$ at $x=1$</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/(n \cdot 2^n)$</td><td>$\ln 2$</td><td>$-\ln(1-x)$ at $x=1/2$</td></tr>
+        <tr><td>$\sum_{n=0}^{\infty} (-1)^n/(2n+1)$</td><td>$\pi/4$</td><td>$\arctan x$ at $x=1$</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/n^2$</td><td>$\pi^2/6$</td><td>Basel</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} (-1)^{n-1}/n^2$</td><td>$\pi^2/12$</td><td>$\eta(2)$</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/(2n-1)^2$</td><td>$\pi^2/8$</td><td>$\zeta(2)$ 奇项</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/n^4$</td><td>$\pi^4/90$</td><td>$\zeta(4)$</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/(n(n+1))$</td><td>$1$</td><td>望远镜</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} 1/(4n^2-1)$</td><td>$1/2$</td><td>望远镜</td></tr>
+        <tr><td>$\sum_{n=0}^{\infty} x^n$</td><td>$1/(1-x)$, $|x|<1$</td><td>几何</td></tr>
+        <tr><td>$\sum_{n=1}^{\infty} n x^{n-1}$</td><td>$1/(1-x)^2$</td><td>几何求导</td></tr>
+    </table>
+</div>
+
+<div class="box box-danger">
+    <div class="box-label">💀 考前避坑提醒</div>
+    <ul>
+        <li><strong>下标从 0 还是从 1？</strong> $\sum_{n=0}^{\infty} 1/n! = e$，但 $\sum_{n=1}^{\infty} 1/n! = e - 1$。差一个 $1$ 就全错。</li>
+        <li><strong>$(-1)^n$ 还是 $(-1)^{n-1}$？</strong> $\sum_{n=1}^{\infty} (-1)^{n-1}/n = \ln 2$，但 $\sum_{n=1}^{\infty} (-1)^n/n = -\ln 2$。符号搞反 = 整题作废。</li>
+        <li><strong>$\ln 2$ 与 $\pi^2/12$ 别混。</strong> 一次方分母 → $\ln 2$，平方分母 → $\pi^2/12$。</li>
+        <li><strong>$\sum P(n)/n!$ 的标准套路：</strong> 把 $P(n)$ 写成下降阶乘 $n(n-1)(n-2)\cdots$ 的组合，每段都化为 $e$ 的下标平移。<strong>不要硬展开！</strong></li>
+    </ul>
+</div>
+
 
 <hr style="border: none; border-top: 2px solid var(--border); margin: 50px 0;">
 
